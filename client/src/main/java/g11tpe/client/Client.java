@@ -31,7 +31,7 @@ public class Client {
 
     private static void query1(HazelcastInstance hz) {
         JobTracker jobTracker = hz.getJobTracker("flight-count");
-        final IList<Movement> list = hz.getList("movements");
+        final IList<Movement> list = hz.getList("movements2");
 
         populate(list);
 

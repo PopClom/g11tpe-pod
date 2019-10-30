@@ -15,7 +15,7 @@ public class Movement implements DataSerializable {
     private String destination;
     private String airline;
 
-    public Movement () {}
+    public Movement () {} //For serialization
 
     public Movement (FlightClassification classification,
                      MoveType movementType,
