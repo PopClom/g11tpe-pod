@@ -15,6 +15,8 @@ public class Movement implements DataSerializable {
     private String destination;
     private String airline;
 
+    public Movement () {}
+
     public Movement (FlightClassification classification,
                      MoveType movementType,
                      FlightClass flightClass,
@@ -31,6 +33,26 @@ public class Movement implements DataSerializable {
         this.origin = origin;
         this.flightClass = flightClass;
         this.movementType = movementType;
+    }
+
+    public String getOrigin() {
+        return origin;
+    }
+
+    public String getDestination() {
+        return destination;
+    }
+
+    public MoveType getMovementType() {
+        return movementType;
+    }
+
+    public FlightClass getFlightClass() {
+        return flightClass;
+    }
+
+    public FlightClassification getFlightClassification() {
+        return classification;
     }
 
     @Override
