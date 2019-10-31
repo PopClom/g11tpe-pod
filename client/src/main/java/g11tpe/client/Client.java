@@ -5,6 +5,7 @@ import com.hazelcast.client.config.ClientConfig;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.ICompletableFuture;
 import com.hazelcast.core.IList;
+import com.hazelcast.core.IMap;
 import com.hazelcast.mapreduce.Job;
 import com.hazelcast.mapreduce.JobTracker;
 import com.hazelcast.mapreduce.KeyValueSource;
@@ -22,6 +23,7 @@ import g11tpe.mappers.MovementCountMapper;
 import g11tpe.reducers.CabotagePerAirlineReducerFactory;
 import g11tpe.reducers.DestinationsReducerFactory;
 import g11tpe.reducers.MovementCountReducerFactory;
+import org.apache.commons.lang3.tuple.MutablePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,46 +37,49 @@ public class Client {
         final ClientConfig ccfg = new ClientConfig();
         final HazelcastInstance hz = HazelcastClient.newHazelcastClient(ccfg);
         logger.info("g11tpe Client Starting ...");
-        query1(hz);
+        MovementsPerAirport(hz);
         int n = 3;
         CabotagePerAirline(hz, n);
         Destinations(hz, "EZEI", n);
     }
 
-    private static void query1(HazelcastInstance hz) {
+    private static void MovementsPerAirport(HazelcastInstance hz) {
         JobTracker jobTracker = hz.getJobTracker("flight-count");
-        final IList<Movement> list = hz.getList("movements");
+        final IList<Movement> movements = hz.getList("movements");
+        final IMap<String, String> airports = hz.getMap("airports");
 
-        populate(list);
+        populate(movements, airports);
 
-        final KeyValueSource<String, Movement> source = KeyValueSource.fromList(list);
+        final KeyValueSource<String, Movement> source = KeyValueSource.fromList(movements);
 
         Job<String, Movement> job = jobTracker.newJob(source);
-        ICompletableFuture<Map<String, Integer>> future = job
+        ICompletableFuture<Map<String, MutablePair<String, Integer>>> future = job
                 .mapper(new MovementCountMapper())
                 .reducer(new MovementCountReducerFactory())
                 .submit();
 
         try {
-            Map<String, Integer> result = future.get();
+            Map<String, MutablePair<String, Integer>> result = future.get();
             result.forEach((key, value) -> System.out.println("" + key + ": " + value));
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
     }
 
-    private static void populate(IList<Movement> list) {
+    private static void populate(IList<Movement> list, IMap<String, String> map) {
         try {
             list.add(new Movement(FlightClassification.CABOTAGE, MoveType.TAKEOFF, FlightClass.PRIVATE_FOREIGNER, "EZEI", "CORD", "Flybondi"));
             list.add(new Movement(FlightClassification.CABOTAGE, MoveType.TAKEOFF, FlightClass.PRIVATE_FOREIGNER, "EZEI", "CORD", "Aerolineas Argentinas"));
             list.add(new Movement(FlightClassification.CABOTAGE, MoveType.TAKEOFF, FlightClass.PRIVATE_FOREIGNER, "EZEI", "CORD", "Emirates"));
             list.add(new Movement(FlightClassification.CABOTAGE, MoveType.LANDING, FlightClass.PRIVATE_FOREIGNER, "EZEI", "CORD", "Flybondi"));
             list.add(new Movement(FlightClassification.CABOTAGE, MoveType.LANDING, FlightClass.PRIVATE_FOREIGNER, "EZEI", "CORD", "Aerolineas Argentinas"));
-            list.add(new Movement(FlightClassification.CABOTAGE, MoveType.LANDING, FlightClass.PRIVATE_FOREIGNER, "EZEI", "CORD", "Emirates"));
-            list.add(new Movement(FlightClassification.CABOTAGE, MoveType.TAKEOFF, FlightClass.PRIVATE_FOREIGNER, "EZEI", "CORD", "Emirates"));
-            list.add(new Movement(FlightClassification.CABOTAGE, MoveType.TAKEOFF, FlightClass.PRIVATE_FOREIGNER, "EZEI", "CORD", "Emirates"));
-            list.add(new Movement(FlightClassification.CABOTAGE, MoveType.LANDING, FlightClass.PRIVATE_FOREIGNER, "EZEI", "CORD", "Emirates"));
-            list.add(new Movement(FlightClassification.CABOTAGE, MoveType.LANDING, FlightClass.PRIVATE_FOREIGNER, "EZEI", "CORD", "Emirates"));
+            list.add(new Movement(FlightClassification.CABOTAGE, MoveType.LANDING, FlightClass.PRIVATE_FOREIGNER, "EZEI", "CORD", "Flybondi"));
+            list.add(new Movement(FlightClassification.CABOTAGE, MoveType.TAKEOFF, FlightClass.PRIVATE_FOREIGNER, "EZEI", "CORD", "Flybondi"));
+            list.add(new Movement(FlightClassification.CABOTAGE, MoveType.TAKEOFF, FlightClass.PRIVATE_FOREIGNER, "EZEI", "CORD", "Flybondi"));
+            list.add(new Movement(FlightClassification.CABOTAGE, MoveType.LANDING, FlightClass.PRIVATE_FOREIGNER, "EZEI", "CORD", "Flybondi"));
+            list.add(new Movement(FlightClassification.CABOTAGE, MoveType.LANDING, FlightClass.PRIVATE_FOREIGNER, "EZEI", "CORD", "Flybondi"));
+            map.put("EZEI", "EZEIZA");
+            map.put("CORD", "CORDOBA");
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
