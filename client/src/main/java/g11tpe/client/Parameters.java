@@ -3,7 +3,6 @@ package g11tpe.client;
 import g11tpe.client.exceptions.InvalidProgramParametersException;
 
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 
@@ -22,32 +21,29 @@ public class Parameters {
     private int n;
     private String oaci;
 
-
-
     public void validate() throws InvalidProgramParametersException {
         Properties properties = System.getProperties();
+        boolean valid, queryNOK;
 
-        boolean addressOK, inPathOK, outPathOK, queryNOK;
-        boolean oaciOK = true, nOK = true;
-
-        addressOK = validateAddress(properties);
-        inPathOK = validateInPath(properties);
-        outPathOK = validateOutPath(properties);
+        valid = validateAddress(properties);
+        valid &= validateInPath(properties);
+        valid &= validateOutPath(properties);
         queryNOK = validateQueryN(properties);
+        valid &= queryNOK;
 
         if (queryNOK) {
             switch (queryN) {
                 case 2:
-                    nOK = validateN(properties);
+                    valid &= validateN(properties);
                     break;
                 case 4:
-                    nOK = validateN(properties);
-                    oaciOK = validateOaci(properties);
+                    valid &= validateN(properties);
+                    valid &= validateOaci(properties);
                     break;
             }
         }
 
-        if (!(addressOK && inPathOK && outPathOK && queryNOK && nOK && oaciOK)) {
+        if (!valid) {
             printParametersHelp ();
             throw new InvalidProgramParametersException("Invalid program parameters.");
         }
@@ -58,7 +54,7 @@ public class Parameters {
             System.out.println("Oaci parameter missing.");
             return false;
         }
-        oaci = properties.getProperty("outPath");
+        oaci = properties.getProperty("oaci");
         return true;
     }
 
