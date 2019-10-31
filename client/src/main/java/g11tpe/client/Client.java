@@ -14,7 +14,9 @@ import g11tpe.combiners.CabotagePerAirlineCombinerFacctory;
 import g11tpe.enums.FlightClass;
 import g11tpe.enums.FlightClassification;
 import g11tpe.enums.MoveType;
+import g11tpe.keypredicates.DestinationsKeyPredicate;
 import g11tpe.mappers.CabotagePerAirlineMapper;
+import g11tpe.mappers.DestinationsMapper;
 import g11tpe.mappers.MovementCountMapper;
 import g11tpe.reducers.CabotagePerAirlineReducerFactory;
 import g11tpe.reducers.MovementCountReducerFactory;
@@ -32,7 +34,8 @@ public class Client {
         logger.info("g11tpe Client Starting ...");
         query1(hz);
         int n = 3;
-        query2(hz, n);
+        CabotagePerAirline(hz, n);
+        Destinations(hz, "EZEI", n);
     }
 
     private static void query1(HazelcastInstance hz) {
@@ -67,7 +70,7 @@ public class Client {
         }
     }
 
-    private static void query2(HazelcastInstance hz, int n) {
+    private static void CabotagePerAirline(HazelcastInstance hz, int n) {
 
         JobTracker jobTracker = hz.getJobTracker("airline-cabotage-count");
         final IList<Movement> list = hz.getList("movements");
@@ -86,5 +89,19 @@ public class Client {
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
+    }
+
+    private static void Destinations (HazelcastInstance hz, String origin, int n) {
+
+        JobTracker jobTracker = hz.getJobTracker("destinations-count");
+        final IList<Movement> list = hz.getList("movements");
+        final KeyValueSource<String, Movement> source = KeyValueSource.fromList(list);
+
+        Job<String, Movement> job = jobTracker.newJob(source);
+        ICompletableFuture<Map<String, Double>> future = job
+                .mapper(new DestinationsMapper())
+                .combiner(new DestinationsCombinerFacctory())
+                .reducer(new DestinationsReducerFactory())
+                .submit(new DestinationsCollator());
     }
 }
