@@ -10,12 +10,12 @@ import com.hazelcast.mapreduce.JobTracker;
 import com.hazelcast.mapreduce.KeyValueSource;
 import g11tpe.*;
 import g11tpe.collators.CabotagePerAirlineCollator;
+import g11tpe.collators.DestinationsCollator;
 import g11tpe.combiners.CabotagePerAirlineCombinerFacctory;
 import g11tpe.combiners.DestinationsCombinerFactory;
 import g11tpe.enums.FlightClass;
 import g11tpe.enums.FlightClassification;
 import g11tpe.enums.MoveType;
-import g11tpe.keypredicates.DestinationsKeyPredicate;
 import g11tpe.mappers.CabotagePerAirlineMapper;
 import g11tpe.mappers.DestinationsMapper;
 import g11tpe.mappers.MovementCountMapper;
@@ -102,10 +102,17 @@ public class Client {
         final KeyValueSource<String, Movement> source = KeyValueSource.fromList(list);
 
         Job<String, Movement> job = jobTracker.newJob(source);
-        ICompletableFuture<Map<String, Double>> future = job
+        ICompletableFuture<Map<String, Long>> future = job
                 .mapper(new DestinationsMapper())
                 .combiner(new DestinationsCombinerFactory())
                 .reducer(new DestinationsReducerFactory())
                 .submit(new DestinationsCollator());
+
+        try {
+            Map<String, Long> result = future.get();
+            result.forEach((key, value) -> System.out.println("" + key + ": " + value));
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
     }
 }

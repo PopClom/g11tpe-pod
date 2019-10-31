@@ -5,7 +5,6 @@ import com.hazelcast.mapreduce.Collator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 public class DestinationsCollator implements Collator<Map.Entry<String, Long>, Map<String, Long>> {
