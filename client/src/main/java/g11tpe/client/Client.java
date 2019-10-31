@@ -5,6 +5,7 @@ import com.hazelcast.client.config.ClientConfig;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.ICompletableFuture;
 import com.hazelcast.core.IList;
+import com.hazelcast.core.IMap;
 import com.hazelcast.mapreduce.Job;
 import com.hazelcast.mapreduce.JobTracker;
 import com.hazelcast.mapreduce.KeyValueSource;
@@ -14,6 +15,7 @@ import g11tpe.MoveType;
 import g11tpe.Movement;
 import g11tpe.mappers.MovementCountMapper;
 import g11tpe.reducers.MovementCountReducerFactory;
+import org.apache.commons.lang3.tuple.MutablePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,20 +33,23 @@ public class Client {
 
     private static void query1(HazelcastInstance hz) {
         JobTracker jobTracker = hz.getJobTracker("flight-count");
-        final IList<Movement> list = hz.getList("movements2");
+        final IList<Movement> movements = hz.getList("movements");
+        final IMap<String, String> airports = hz.getMap("airports");
+        airports.put("EZEI", "EZEIZA");
+        airports.put("CORD", "CORDOBA");
 
-        populate(list);
+        populate(movements);
 
-        final KeyValueSource<String, Movement> source = KeyValueSource.fromList(list);
+        final KeyValueSource<String, Movement> source = KeyValueSource.fromList(movements);
 
         Job<String, Movement> job = jobTracker.newJob(source);
-        ICompletableFuture<Map<String, Integer>> future = job
+        ICompletableFuture<Map<String, MutablePair<String, Integer>>> future = job
                 .mapper(new MovementCountMapper())
                 .reducer(new MovementCountReducerFactory())
                 .submit();
 
         try {
-            Map<String, Integer> result = future.get();
+            Map<String, MutablePair<String, Integer>> result = future.get();
             System.out.println("EZEI: " + result.get("EZEI"));
             System.out.println("CORD: " + result.get("CORD"));
         } catch (Exception e) {
