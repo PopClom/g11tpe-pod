@@ -11,6 +11,7 @@ import com.hazelcast.mapreduce.KeyValueSource;
 import g11tpe.*;
 import g11tpe.collators.CabotagePerAirlineCollator;
 import g11tpe.combiners.CabotagePerAirlineCombinerFacctory;
+import g11tpe.combiners.DestinationsCombinerFactory;
 import g11tpe.enums.FlightClass;
 import g11tpe.enums.FlightClassification;
 import g11tpe.enums.MoveType;
@@ -19,11 +20,13 @@ import g11tpe.mappers.CabotagePerAirlineMapper;
 import g11tpe.mappers.DestinationsMapper;
 import g11tpe.mappers.MovementCountMapper;
 import g11tpe.reducers.CabotagePerAirlineReducerFactory;
+import g11tpe.reducers.DestinationsReducerFactory;
 import g11tpe.reducers.MovementCountReducerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class Client {
     private static Logger logger = LoggerFactory.getLogger(Client.class);
@@ -95,12 +98,13 @@ public class Client {
 
         JobTracker jobTracker = hz.getJobTracker("destinations-count");
         final IList<Movement> list = hz.getList("movements");
+        list.removeIf(element -> !element.getOrigin().equals(origin));
         final KeyValueSource<String, Movement> source = KeyValueSource.fromList(list);
 
         Job<String, Movement> job = jobTracker.newJob(source);
         ICompletableFuture<Map<String, Double>> future = job
                 .mapper(new DestinationsMapper())
-                .combiner(new DestinationsCombinerFacctory())
+                .combiner(new DestinationsCombinerFactory())
                 .reducer(new DestinationsReducerFactory())
                 .submit(new DestinationsCollator());
     }
