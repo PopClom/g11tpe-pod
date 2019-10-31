@@ -11,28 +11,35 @@ public class MovementCountReducerFactory implements ReducerFactory<String, Integ
     private transient HazelcastInstance hz;
 
     @Override
-    public Reducer<Integer, MutablePair<String, Integer>> newReducer(String key) {
-        return new Reducer<Integer, MutablePair<String, Integer>>() {
-            private volatile int sum;
-            @Override
-            public void beginReduce () {
-                sum = 0;
-            }
-            @Override
-            public void reduce(Integer value) {
-                sum += value;
-            }
-            @Override
-            public MutablePair<String, Integer> finalizeReduce() {
-                final IMap<String, String> airports = hz.getMap("airports");
-                return new MutablePair<>(airports.get(key), sum);
-            }
-        };
-    }
-
-    @Override
     public void setHazelcastInstance(HazelcastInstance hz) {
         this.hz = hz;
     }
 
+    @Override
+    public Reducer<Integer, MutablePair<String, Integer>> newReducer(String key) {
+        return new MovementCountReducer(key);
+    }
+
+    private class MovementCountReducer extends Reducer<Integer, MutablePair<String, Integer>> {
+        private volatile int sum;
+        private volatile String key;
+
+        private MovementCountReducer(String key) {
+            this.key = key;
+        }
+
+        @Override
+        public void beginReduce () {
+            sum = 0;
+        }
+        @Override
+        public void reduce(Integer value) {
+            sum += value;
+        }
+        @Override
+        public MutablePair<String, Integer> finalizeReduce() {
+            final IMap<String, String> airports = hz.getMap("airports");
+            return new MutablePair<>(airports.get(this.key), sum);
+        }
+    }
 }

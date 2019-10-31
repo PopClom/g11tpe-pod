@@ -12,6 +12,7 @@ import com.hazelcast.mapreduce.KeyValueSource;
 import g11tpe.*;
 import g11tpe.collators.CabotagePerAirlineCollator;
 import g11tpe.collators.DestinationsCollator;
+import g11tpe.collators.MovementCountCollator;
 import g11tpe.combiners.CabotagePerAirlineCombinerFacctory;
 import g11tpe.combiners.DestinationsCombinerFactory;
 import g11tpe.enums.FlightClass;
@@ -56,7 +57,7 @@ public class Client {
         ICompletableFuture<Map<String, MutablePair<String, Integer>>> future = job
                 .mapper(new MovementCountMapper())
                 .reducer(new MovementCountReducerFactory())
-                .submit();
+                .submit(new MovementCountCollator());
 
         try {
             Map<String, MutablePair<String, Integer>> result = future.get();
@@ -74,8 +75,8 @@ public class Client {
             list.add(new Movement(FlightClassification.CABOTAGE, MoveType.LANDING, FlightClass.PRIVATE_FOREIGNER, "EZEI", "CORD", "Flybondi"));
             list.add(new Movement(FlightClassification.CABOTAGE, MoveType.LANDING, FlightClass.PRIVATE_FOREIGNER, "EZEI", "CORD", "Aerolineas Argentinas"));
             list.add(new Movement(FlightClassification.CABOTAGE, MoveType.LANDING, FlightClass.PRIVATE_FOREIGNER, "EZEI", "CORD", "Flybondi"));
-            list.add(new Movement(FlightClassification.CABOTAGE, MoveType.TAKEOFF, FlightClass.PRIVATE_FOREIGNER, "EZEI", "CORD", "Flybondi"));
-            list.add(new Movement(FlightClassification.CABOTAGE, MoveType.TAKEOFF, FlightClass.PRIVATE_FOREIGNER, "EZEI", "CORD", "Flybondi"));
+            list.add(new Movement(FlightClassification.CABOTAGE, MoveType.TAKEOFF, FlightClass.PRIVATE_FOREIGNER, "EZEI", "CORD", "Emirates"));
+            list.add(new Movement(FlightClassification.CABOTAGE, MoveType.TAKEOFF, FlightClass.PRIVATE_FOREIGNER, "EZEI", "CORD", "Emirates"));
             list.add(new Movement(FlightClassification.CABOTAGE, MoveType.LANDING, FlightClass.PRIVATE_FOREIGNER, "EZEI", "CORD", "Flybondi"));
             list.add(new Movement(FlightClassification.CABOTAGE, MoveType.LANDING, FlightClass.PRIVATE_FOREIGNER, "EZEI", "CORD", "Flybondi"));
             map.put("EZEI", "EZEIZA");
