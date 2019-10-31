@@ -21,8 +21,6 @@ public class Client {
     private static Parameters parameters;
 
     public static void main(String[] args) {
-//        Config config = new Config();
-//        HazelcastInstance h = Hazelcast.newHazelcastInstance(config);
         logger.info("g11tpe Client Starting ...");
         parameters = new Parameters();
         try {
@@ -31,7 +29,6 @@ public class Client {
             logger.error(e.getMessage());
             System.exit(-1);
         }
-
 
         ClientConfig config = new ClientConfig();
         GroupConfig groupConfig = config.getGroupConfig();
@@ -48,7 +45,6 @@ public class Client {
         IMap<Long, String> map = hzClient.getMap("data");
         System.out.println(map.values());
 
-        IMap<String, Airport> airportIMap;
         IList<Movement> movementsIList;
 
 
