@@ -8,11 +8,15 @@ import com.hazelcast.core.IList;
 import com.hazelcast.mapreduce.Job;
 import com.hazelcast.mapreduce.JobTracker;
 import com.hazelcast.mapreduce.KeyValueSource;
-import g11tpe.FlightClass;
-import g11tpe.FlightClassification;
-import g11tpe.MoveType;
-import g11tpe.Movement;
+import g11tpe.*;
+import g11tpe.collators.CabotagePerAirlineCollator;
+import g11tpe.combiners.CabotagePerAirlineCombinerFacctory;
+import g11tpe.enums.FlightClass;
+import g11tpe.enums.FlightClassification;
+import g11tpe.enums.MoveType;
+import g11tpe.mappers.CabotagePerAirlineMapper;
 import g11tpe.mappers.MovementCountMapper;
+import g11tpe.reducers.CabotagePerAirlineReducerFactory;
 import g11tpe.reducers.MovementCountReducerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,11 +31,13 @@ public class Client {
         final HazelcastInstance hz = HazelcastClient.newHazelcastClient(ccfg);
         logger.info("g11tpe Client Starting ...");
         query1(hz);
+        int n = 3;
+        query2(hz, n);
     }
 
     private static void query1(HazelcastInstance hz) {
         JobTracker jobTracker = hz.getJobTracker("flight-count");
-        final IList<Movement> list = hz.getList("movements2");
+        final IList<Movement> list = hz.getList("movements");
 
         populate(list);
 
@@ -56,6 +62,27 @@ public class Client {
             list.add(new Movement(FlightClassification.CABOTAGE, MoveType.TAKEOFF, FlightClass.PRIVATE_FOREIGNER, "EZEI", "CORD", "Flybondi"));
             list.add(new Movement(FlightClassification.CABOTAGE, MoveType.LANDING, FlightClass.PRIVATE_FOREIGNER, "EZEI", "CORD", "Aerolineas Argentinas"));
             list.add(new Movement(FlightClassification.CABOTAGE, MoveType.LANDING, FlightClass.PRIVATE_FOREIGNER, "EZEI", "CORD", "Emirates"));
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    private static void query2(HazelcastInstance hz, int n) {
+
+        JobTracker jobTracker = hz.getJobTracker("airline-cabotage-count");
+        final IList<Movement> list = hz.getList("movements");
+        final KeyValueSource<String, Movement> source = KeyValueSource.fromList(list);
+
+        Job<String, Movement> job = jobTracker.newJob(source);
+        ICompletableFuture<Map<String, Double>> future = job
+                .mapper(new CabotagePerAirlineMapper())
+                .combiner(new CabotagePerAirlineCombinerFacctory())
+                .reducer(new CabotagePerAirlineReducerFactory())
+                .submit(new CabotagePerAirlineCollator());
+
+        try {
+            Map<String, Double> result = future.get();
+            result.forEach((key, value) -> System.out.println("" + key + ": " + value + "%"));
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }

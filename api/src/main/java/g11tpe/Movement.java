@@ -3,6 +3,9 @@ package g11tpe;
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.nio.serialization.DataSerializable;
+import g11tpe.enums.FlightClass;
+import g11tpe.enums.FlightClassification;
+import g11tpe.enums.MoveType;
 
 import java.io.IOException;
 
@@ -53,6 +56,10 @@ public class Movement implements DataSerializable {
 
     public FlightClassification getFlightClassification() {
         return classification;
+    }
+
+    public String getAirline() {
+        return airline;
     }
 
     @Override

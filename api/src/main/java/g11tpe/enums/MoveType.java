@@ -1,4 +1,4 @@
-package g11tpe;
+package g11tpe.enums;
 
 public enum MoveType {
     TAKEOFF,

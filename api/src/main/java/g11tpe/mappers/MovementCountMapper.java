@@ -1,7 +1,7 @@
 package g11tpe.mappers;
 import com.hazelcast.mapreduce.Context;
 import com.hazelcast.mapreduce.Mapper;
-import g11tpe.MoveType;
+import g11tpe.enums.MoveType;
 import g11tpe.Movement;
 
 public class MovementCountMapper implements Mapper<String, Movement, String, Integer> {
