@@ -45,8 +45,7 @@ public class Client {
 
         try {
             Map<String, Integer> result = future.get();
-            System.out.println("EZEI: " + result.get("EZEI"));
-            System.out.println("CORD: " + result.get("CORD"));
+            result.forEach((key, value) -> System.out.println("" + key + ": " + value));
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
