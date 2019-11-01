@@ -101,28 +101,11 @@ public class QueryExecutor {
                 .mapper(new CabotagePerAirlineMapper())
                 .combiner(new CabotagePerAirlineCombinerFacctory())
                 .reducer(new CabotagePerAirlineReducerFactory())
-                .submit(new CabotagePerAirlineCollator());
+                .submit(new CabotagePerAirlineCollator(n));
 
         try {
             Map<String, Double> result = future.get();
-            Map<String, Double> limitedResult = new HashMap<>();
-            AtomicReference<Double> acum = new AtomicReference<>(0.0);
-            AtomicInteger i = new AtomicInteger();
-
-            result.forEach((key, value) -> {
-                if (i.get() <= n) {
-                    limitedResult.put(key, value);
-                } else {
-                    acum.updateAndGet(v -> v + value);
-                }
-                i.getAndIncrement();
-            });
-
-            if (i.get() > n) {
-                limitedResult.put("Otros", acum.get());
-            }
-
-            return Optional.of(limitedResult);
+            return Optional.of(result);
         } catch (Exception e) {
             e.printStackTrace();
             return Optional.empty();
