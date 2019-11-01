@@ -24,10 +24,10 @@ public class Client {
         final IMap<String, String> airports = hz.getMap("airports");
         populate(movements, airports);
         QueryExecutor qe = new QueryExecutor(hz);
-        //qe.movementsPerAirport(hz);
+        qe.movementsPerAirport(hz);
         int n = 3;
-        //qe.cabotagePerAirline(n);
-        //qe.destinations("EZEI", n);
+        qe.cabotagePerAirline(n);
+        qe.destinations("EZEI", n);
         qe.movementsPerAirportPair();
     }
 
@@ -43,8 +43,10 @@ public class Client {
             list.add(new Movement(FlightClassification.CABOTAGE, MoveType.TAKEOFF, FlightClass.PRIVATE_FOREIGNER, "EZEI", "CORD", "Emirates"));
             list.add(new Movement(FlightClassification.CABOTAGE, MoveType.LANDING, FlightClass.PRIVATE_FOREIGNER, "EZEI", "CORD", "Flybondi"));
             list.add(new Movement(FlightClassification.CABOTAGE, MoveType.LANDING, FlightClass.PRIVATE_FOREIGNER, "EZEI", "CORD", "Flybondi"));
+            list.add(new Movement(FlightClassification.CABOTAGE, MoveType.TAKEOFF, FlightClass.PRIVATE_FOREIGNER, "PALO", "CORD", "Flybondi"));
             map.put("EZEI", "EZEIZA");
             map.put("CORD", "CORDOBA");
+            map.put("PALO", "PALOMAR");
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }

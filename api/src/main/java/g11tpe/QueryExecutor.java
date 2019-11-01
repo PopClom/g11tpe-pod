@@ -10,6 +10,7 @@ import com.hazelcast.mapreduce.KeyValueSource;
 import g11tpe.collators.CabotagePerAirlineCollator;
 import g11tpe.collators.DestinationsCollator;
 import g11tpe.collators.MovementCountCollator;
+import g11tpe.collators.MovementsPerAirportPairCollator;
 import g11tpe.combiners.CabotagePerAirlineCombinerFacctory;
 import g11tpe.combiners.DestinationsCombinerFactory;
 import g11tpe.mappers.CabotagePerAirlineMapper;
@@ -19,6 +20,7 @@ import g11tpe.mappers.MovementsPerAirportPairMapper;
 import g11tpe.reducers.*;
 import org.apache.commons.lang3.tuple.MutablePair;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -72,14 +74,15 @@ public class QueryExecutor {
         final KeyValueSource<String, Integer> source2 = KeyValueSource.fromMap(movementsAux);
 
         Job<String, Integer> job2 = jobTracker.newJob(source2);
-        ICompletableFuture<Map<Integer, Set<String>>> future2 = job2
+        ICompletableFuture<List<MutablePair<Integer, MutablePair<String, String>>>> future2 = job2
                 .mapper(new MovementsPerAirportPairMapper())
                 .reducer(new MovementsPerAiportPairReducerFactory())
-                .submit();
+                .submit(new MovementsPerAirportPairCollator());
 
         try {
-            Map<Integer, Set<String>> result2 = future2.get();
-            result2.forEach((key, value) -> System.out.println("" + key + ": " + value));
+            List<MutablePair<Integer, MutablePair<String, String>>> result2 = future2.get();
+            result2.forEach((elem) -> System.out.println("" + elem.getLeft() + ", " +
+                    elem.getRight().getLeft() + ", " + elem.getRight().getRight()));
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
