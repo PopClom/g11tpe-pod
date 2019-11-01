@@ -9,8 +9,12 @@ import g11tpe.*;
 import g11tpe.enums.FlightClass;
 import g11tpe.enums.FlightClassification;
 import g11tpe.enums.MoveType;
+import org.apache.commons.lang3.tuple.MutablePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Map;
+import java.util.Optional;
 
 public class Client {
     private static Logger logger = LoggerFactory.getLogger(Client.class);
@@ -22,12 +26,38 @@ public class Client {
 
         final IList<Movement> movements = hz.getList("movements");
         final IMap<String, String> airports = hz.getMap("airports");
+
         populate(movements, airports);
+
         QueryExecutor qe = new QueryExecutor(hz);
-        qe.movementsPerAirport(hz);
+
+        /* QUERY 1 */
+        Optional<Map<String, MutablePair<String, Integer>>> movesPerAirport = qe.movementsPerAirport(hz);
+        if (!movesPerAirport.isPresent()) {
+            /* tirar un error */
+        }
+        else {
+            movesPerAirport.get().forEach((key, value) -> System.out.println("" + key + ";" + value));
+        }
+
         int n = 3;
-        qe.cabotagePerAirline(n);
-        qe.destinations("EZEI", n);
+
+        /* QUERY 2 */
+        Optional<Map<String, Double>> cabotagePerAirline = qe.cabotagePerAirline(n);
+        if (!cabotagePerAirline.isPresent()) {
+            /* tirar un error */
+        } else {
+            cabotagePerAirline.get().forEach( (key, value) -> System.out.println("" + key + ";" + value + "%"));
+        }
+
+        /* QUERY 4 */
+        Optional<Map<String, Long>> destinations = qe.destinations("EZEI", n);
+        if (!destinations.isPresent()) {
+            /* tirar un error */
+        } else {
+            destinations.get().forEach( (key, value) -> System.out.println("" + key + ";" + value));
+        }
+
     }
 
     private static void populate(IList<Movement> list, IMap<String, String> map) {

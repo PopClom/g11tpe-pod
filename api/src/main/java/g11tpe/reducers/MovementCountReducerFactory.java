@@ -7,7 +7,7 @@ import com.hazelcast.mapreduce.Reducer;
 import com.hazelcast.mapreduce.ReducerFactory;
 import org.apache.commons.lang3.tuple.MutablePair;
 
-public class MovementCountReducerFactory implements ReducerFactory<String, Integer, MutablePair<String, Integer>>, HazelcastInstanceAware {
+public class MovementCountReducerFactory implements ReducerFactory<String, Long, MutablePair<String, Long>>, HazelcastInstanceAware {
     private transient HazelcastInstance hz;
 
     @Override
@@ -16,12 +16,12 @@ public class MovementCountReducerFactory implements ReducerFactory<String, Integ
     }
 
     @Override
-    public Reducer<Integer, MutablePair<String, Integer>> newReducer(String key) {
+    public Reducer<Long, MutablePair<String, Long>> newReducer(String key) {
         return new MovementCountReducer(key);
     }
 
-    private class MovementCountReducer extends Reducer<Integer, MutablePair<String, Integer>> {
-        private volatile int sum;
+    private class MovementCountReducer extends Reducer<Long, MutablePair<String, Long>> {
+        private volatile long sum;
         private volatile String key;
 
         private MovementCountReducer(String key) {
@@ -33,11 +33,11 @@ public class MovementCountReducerFactory implements ReducerFactory<String, Integ
             sum = 0;
         }
         @Override
-        public void reduce(Integer value) {
+        public void reduce(Long value) {
             sum += value;
         }
         @Override
-        public MutablePair<String, Integer> finalizeReduce() {
+        public MutablePair<String, Long> finalizeReduce() {
             final IMap<String, String> airports = hz.getMap("airports");
             return new MutablePair<>(airports.get(this.key), sum);
         }

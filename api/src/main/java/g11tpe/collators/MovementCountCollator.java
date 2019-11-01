@@ -8,11 +8,11 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class MovementCountCollator implements Collator<Map.Entry<String, MutablePair<String, Integer>>, Map<String, MutablePair<String, Integer>>> {
+public class MovementCountCollator implements Collator<Map.Entry<String, MutablePair<String, Long>>, Map<String, MutablePair<String, Long>>> {
     @Override
-    public Map<String, MutablePair<String, Integer>> collate(Iterable<Map.Entry<String, MutablePair<String, Integer>>> values ) {
+    public Map<String, MutablePair<String, Long>> collate(Iterable<Map.Entry<String, MutablePair<String, Long>>> values ) {
 
-        Map<String, MutablePair<String, Integer>> map = new HashMap<>();
+        Map<String, MutablePair<String, Long>> map = new HashMap<>();
         values.forEach( mapEntry -> {
             map.put(mapEntry.getKey(), mapEntry.getValue());
         });

@@ -19,7 +19,12 @@ import g11tpe.reducers.DestinationsReducerFactory;
 import g11tpe.reducers.MovementCountReducerFactory;
 import org.apache.commons.lang3.tuple.MutablePair;
 
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class QueryExecutor {
     private HazelcastInstance hz;
@@ -28,27 +33,27 @@ public class QueryExecutor {
         this.hz = hz;
     }
 
-    public void movementsPerAirport(HazelcastInstance hz) {
+    public Optional<Map<String, MutablePair<String, Long>>> movementsPerAirport(HazelcastInstance hz) {
         JobTracker jobTracker = hz.getJobTracker("flight-count");
         final IList<Movement> movements = hz.getList("movements");
 
         final KeyValueSource<String, Movement> source = KeyValueSource.fromList(movements);
 
         Job<String, Movement> job = jobTracker.newJob(source);
-        ICompletableFuture<Map<String, MutablePair<String, Integer>>> future = job
+        ICompletableFuture<Map<String, MutablePair<String, Long>>> future = job
                 .mapper(new MovementCountMapper())
                 .reducer(new MovementCountReducerFactory())
                 .submit(new MovementCountCollator());
 
         try {
-            Map<String, MutablePair<String, Integer>> result = future.get();
-            result.forEach((key, value) -> System.out.println("" + key + ": " + value));
+            return Optional.of(future.get());
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            e.printStackTrace();
+            return Optional.empty();
         }
     }
 
-    public void cabotagePerAirline(int n) {
+    public Optional<Map<String, Double>> cabotagePerAirline(int n) {
         JobTracker jobTracker = hz.getJobTracker("airline-cabotage-count");
         final IList<Movement> list = hz.getList("movements");
         final KeyValueSource<String, Movement> source = KeyValueSource.fromList(list);
@@ -62,13 +67,31 @@ public class QueryExecutor {
 
         try {
             Map<String, Double> result = future.get();
-            result.forEach((key, value) -> System.out.println("" + key + ": " + value + "%"));
+            Map<String, Double> limitedResult = new HashMap<>();
+            AtomicReference<Double> acum = new AtomicReference<>(0.0);
+            AtomicInteger i = new AtomicInteger();
+
+            result.forEach((key, value) -> {
+                if (i.get() <= n) {
+                    limitedResult.put(key, value);
+                } else {
+                    acum.updateAndGet(v -> v + value);
+                }
+                i.getAndIncrement();
+            });
+
+            if (i.get() > n) {
+                limitedResult.put("Otros", acum.get());
+            }
+
+            return Optional.of(limitedResult);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            e.printStackTrace();
+            return Optional.empty();
         }
     }
 
-    public void destinations (String origin, int n) {
+    public Optional<Map<String, Long>> destinations (String origin, int n) {
         JobTracker jobTracker = hz.getJobTracker("destinations-count");
         final IList<Movement> list = hz.getList("movements");
         list.removeIf(element -> !element.getOrigin().equals(origin));
@@ -83,11 +106,23 @@ public class QueryExecutor {
 
         try {
             Map<String, Long> result = future.get();
+            Map<String, Long> limitedResult = new HashMap<>();
+            AtomicLong acum = new AtomicLong(0);
+            AtomicInteger i = new AtomicInteger();
+
             result.forEach((key, value) -> {
-                System.out.println("" + key + ": " + value);
+                if (i.get() <= n) {
+                    limitedResult.put(key, value);
+                } else {
+                    acum.updateAndGet(v -> v + value);
+                }
+                i.getAndIncrement();
             });
+
+            return Optional.of(limitedResult);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            e.printStackTrace();
+            return Optional.empty();
         }
     }
 }

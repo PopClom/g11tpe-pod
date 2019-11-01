@@ -4,11 +4,11 @@ import com.hazelcast.mapreduce.Mapper;
 import g11tpe.enums.MoveType;
 import g11tpe.Movement;
 
-public class MovementCountMapper implements Mapper<String, Movement, String, Integer> {
-    private static final int ONE = 1;
+public class MovementCountMapper implements Mapper<String, Movement, String, Long> {
+    private static final long ONE = 1;
 
     @Override
-    public void map(String key, Movement value, Context<String, Integer> context) {
+    public void map(String key, Movement value, Context<String, Long> context) {
         if (value.getMovementType().equals(MoveType.TAKEOFF)) {
             context.emit(value.getOrigin(), ONE);
         } else {
