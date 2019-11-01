@@ -19,13 +19,10 @@ import g11tpe.reducers.DestinationsReducerFactory;
 import g11tpe.reducers.MovementCountReducerFactory;
 import org.apache.commons.lang3.tuple.MutablePair;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class QueryExecutor {
@@ -106,21 +103,7 @@ public class QueryExecutor {
                 .submit(new DestinationsCollator(n));
 
         try {
-            Map<String, Long> result = future.get();
-            /*Map<String, Long> limitedResult = new HashMap<>();
-            AtomicLong acum = new AtomicLong(0);
-            AtomicInteger i = new AtomicInteger();
-
-            result.forEach((key, value) -> {
-                if (i.get() <= n) {
-                    limitedResult.put(key, value);
-                } else {
-                    acum.updateAndGet(v -> v + value);
-                }
-                i.getAndIncrement();
-            });*/
-
-            return Optional.of(result);
+            return Optional.of(future.get());
         } catch (Exception e) {
             e.printStackTrace();
             return Optional.empty();
