@@ -32,7 +32,7 @@ public class Client {
         QueryExecutor qe = new QueryExecutor(hz);
 
         /* QUERY 1 */
-        Optional<Map<String, MutablePair<String, Integer>>> movesPerAirport = qe.movementsPerAirport(hz);
+        Optional<Map<String, MutablePair<String, Long>>> movesPerAirport = qe.movementsPerAirport(hz);
         if (!movesPerAirport.isPresent()) {
             /* tirar un error */
         }
