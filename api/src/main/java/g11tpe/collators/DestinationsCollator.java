@@ -22,7 +22,14 @@ public class DestinationsCollator implements Collator<Map.Entry<String, Long>, M
             map.put(stringLongEntry.getKey(), stringLongEntry.getValue());
         });
 
-        return map.entrySet().stream().sorted(Map.Entry.comparingByValue()).limit(n).collect(Collectors.toMap(
-                Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
+        return map.entrySet().stream().sorted((mapEntry1, mapEntry2) -> {
+            int cmp = mapEntry1.getValue().compareTo(mapEntry2.getValue());
+            if (cmp != 0) {
+                return -cmp;
+            } else {
+                return mapEntry1.getKey().compareTo(mapEntry2.getKey());
+            }
+        }).limit(n)
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
     }
 }
