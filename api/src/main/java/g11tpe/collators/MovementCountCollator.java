@@ -18,10 +18,9 @@ public class MovementCountCollator implements Collator<Map.Entry<String, Mutable
         });
 
         return map.entrySet().stream().sorted((mapEntry1, mapEntry2) -> {
-            if (mapEntry1.getValue().getRight() > mapEntry2.getValue().getRight()) {
-                return -1;
-            } else if (mapEntry1.getValue().getRight() < mapEntry2.getValue().getRight()) {
-                return 1;
+            int cmp = mapEntry1.getValue().getRight().compareTo(mapEntry2.getValue().getRight());
+            if (cmp != 0) {
+                return -cmp;
             } else {
                 return mapEntry1.getKey().compareTo(mapEntry2.getKey());
             }

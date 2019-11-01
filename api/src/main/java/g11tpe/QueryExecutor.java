@@ -3,20 +3,21 @@ package g11tpe;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.ICompletableFuture;
 import com.hazelcast.core.IList;
+import com.hazelcast.core.IMap;
 import com.hazelcast.mapreduce.Job;
 import com.hazelcast.mapreduce.JobTracker;
 import com.hazelcast.mapreduce.KeyValueSource;
 import g11tpe.collators.CabotagePerAirlineCollator;
 import g11tpe.collators.DestinationsCollator;
 import g11tpe.collators.MovementCountCollator;
+import g11tpe.collators.MovementsPerAirportPairCollator;
 import g11tpe.combiners.CabotagePerAirlineCombinerFacctory;
 import g11tpe.combiners.DestinationsCombinerFactory;
 import g11tpe.mappers.CabotagePerAirlineMapper;
 import g11tpe.mappers.DestinationsMapper;
 import g11tpe.mappers.MovementCountMapper;
-import g11tpe.reducers.CabotagePerAirlineReducerFactory;
-import g11tpe.reducers.DestinationsReducerFactory;
-import g11tpe.reducers.MovementCountReducerFactory;
+import g11tpe.mappers.MovementsPerAirportPairMapper;
+import g11tpe.reducers.*;
 import org.apache.commons.lang3.tuple.MutablePair;
 
 import java.util.ArrayList;
@@ -35,8 +36,9 @@ public class QueryExecutor {
         this.hz = hz;
     }
 
+
     public Optional<Map<String, MutablePair<String, Long>>> movementsPerAirport(HazelcastInstance hz) {
-        JobTracker jobTracker = hz.getJobTracker("flight-count");
+        JobTracker jobTracker = hz.getJobTracker("movement-count");
         final IList<Movement> movements = hz.getList("movements");
 
         final KeyValueSource<String, Movement> source = KeyValueSource.fromList(movements);
@@ -51,6 +53,42 @@ public class QueryExecutor {
             return Optional.of(future.get());
         } catch (Exception e) {
             e.printStackTrace();
+            return Optional.empty();
+        }
+    }
+
+    public Optional<List<MutablePair<Long, MutablePair<String, String>>>> movementsPerAirportPair() {
+        JobTracker jobTracker = hz.getJobTracker("movement-pair-count");
+        final IList<Movement> movements = hz.getList("movements");
+
+        final KeyValueSource<String, Movement> source1 = KeyValueSource.fromList(movements);
+
+        Job<String, Movement> job1 = jobTracker.newJob(source1);
+        ICompletableFuture<Map<String, Long>> future1 = job1
+                .mapper(new MovementCountMapper())
+                .reducer(new MovementSimpleCountReducerFactory())
+                .submit();
+
+        final IMap<String, Long> movementsAux = hz.getMap("movements-aux");
+        try {
+            Map<String, Long> result1 = future1.get();
+            movementsAux.putAll(result1);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+
+        final KeyValueSource<String, Long> source2 = KeyValueSource.fromMap(movementsAux);
+
+        Job<String, Long> job2 = jobTracker.newJob(source2);
+        ICompletableFuture<List<MutablePair<Long, MutablePair<String, String>>>> future2 = job2
+                .mapper(new MovementsPerAirportPairMapper())
+                .reducer(new MovementsPerAiportPairReducerFactory())
+                .submit(new MovementsPerAirportPairCollator());
+
+        try {
+            return Optional.of(future2.get());
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
             return Optional.empty();
         }
     }
