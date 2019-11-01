@@ -51,7 +51,7 @@ public class Client {
         }
 
         /* QUERY 4 */
-        Optional<Map<String, Long>> destinations = qe.destinations("EZEI", n);
+        Optional<Map<String, Long>> destinations = qe.destinations("CORD", n);
         if (!destinations.isPresent()) {
             /* tirar un error */
         } else {
