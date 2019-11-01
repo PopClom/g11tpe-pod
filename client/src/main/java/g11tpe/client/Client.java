@@ -37,7 +37,7 @@ public class Client {
     private final static String AIRPORTS_INFILE_NAME = "aeropuertos.csv";
     private final static String MOVEMENTS_INFILE_NAME = "movimientos.csv";
 
-    private static IMap<String, Map<String, String>> airportsIMap ;
+    private static IMap<String, String> airportsIMap ;
     private static IList<Movement> movementsIList;
 
     public static void main(String[] args) {

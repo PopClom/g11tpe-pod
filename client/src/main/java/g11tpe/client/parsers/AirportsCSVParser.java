@@ -16,17 +16,15 @@ public class AirportsCSVParser {
     private static final int OACI_POS = 1;
     private static final int NAME_POS = 4;
 
-    public static void parseFile(final String airportsFilePath, final  IMap<String, Map<String, String>> airportsImap) throws InvalidCSVAirportsFileException, IOException, IllegalArgumentException  {
-        Map<String, Map<String, String>> airportsMap = new HashMap<>();
+    public static void parseFile(final String airportsFilePath, final  IMap<String, String> airportsImap) throws InvalidCSVAirportsFileException, IOException, IllegalArgumentException  {
+        Map<String, String> airportsMap = new HashMap<>();
         try (CSVReader csvReader = new CSVReaderBuilder(new FileReader(airportsFilePath))
                 .withCSVParser(new CSVParserBuilder().withSeparator(';').build())
                 .build()) {
             String[] line = csvReader.readNext(); //skip headers line
             while ((line = csvReader.readNext()) != null) {
                 if(line[OACI_POS].compareTo("") != 0){
-                    Map<String , String> map = new HashMap<>();
-                    map.put(line[OACI_POS], line[NAME_POS]);
-                    airportsMap.put(line[OACI_POS], map);
+                    airportsMap.put(line[OACI_POS], line[NAME_POS]);
                 }
             }
         }
