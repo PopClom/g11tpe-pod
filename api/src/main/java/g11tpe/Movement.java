@@ -52,4 +52,16 @@ public class Movement implements DataSerializable {
         this.movementType = MoveType.values()[in.readInt()];
         this.flightClass = FlightClass.values()[in.readInt()];
     }
+
+    @Override
+    public String toString() {
+        return "Movement{" +
+                "classification=" + classification +
+                ", movementType=" + movementType +
+                ", flightClass=" + flightClass +
+                ", origin='" + origin + '\'' +
+                ", destination='" + destination + '\'' +
+                ", airline='" + airline + '\'' +
+                '}';
+    }
 }

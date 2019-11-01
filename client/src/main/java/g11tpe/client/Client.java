@@ -9,8 +9,11 @@ import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IList;
 import com.hazelcast.core.IMap;
+import g11tpe.FlightClass;
+import g11tpe.FlightClassification;
 import g11tpe.Movement;
 import g11tpe.client.exceptions.InvalidCSVAirportsFileException;
+import g11tpe.client.exceptions.InvalidCSVMovementsFileException;
 import g11tpe.client.exceptions.InvalidProgramParametersException;
 import g11tpe.client.parsers.AirportsCSVParser;
 import g11tpe.client.parsers.MovementsCSVParser;
@@ -40,7 +43,7 @@ public class Client {
             System.exit(-1);
         }
 
-//        HazelcastInstance hzClient = getHazelCastClient();
+        HazelcastInstance hzClient = getHazelCastClient();
 //
 //        //probando que funcione
 //        IMap<Long, String> map = hzClient.getMap("data");
@@ -69,14 +72,10 @@ public class Client {
     private static void parseInFiles() {
         try {
             airportsList = AirportsCSVParser.parseFile(parameters.getInPath() + '/' + AIRPORTS_INFILE_NAME);
-        } catch (InvalidCSVAirportsFileException e) {
+            movementsList = MovementsCSVParser.parseFile(parameters.getInPath() + '/' + MOVEMENTS_INFILE_NAME);
+        } catch (InvalidCSVAirportsFileException | InvalidCSVMovementsFileException | IOException e) {
             e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+            System.exit(-1);
         }
-
-
-        // movementsList =  MovementsCSVParser.parseFile();
-
     }
 }
