@@ -12,6 +12,7 @@ import g11tpe.exceptions.illegalMovementException;
 import org.apache.commons.lang3.tuple.MutablePair;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.util.*;
@@ -57,8 +58,8 @@ public class QueriesTest {
     private static final long EXPECTED_FLIGHTS_5 = 5;
     private static final int MAX_AIRPORTS = 5;
 
-    @Before
-    public final void before() throws illegalMovementException {
+    @BeforeClass
+    public static void setUpClass() throws illegalMovementException {
 
         final IList<Movement> listOfMovements = hz.getList("movements");
 
@@ -194,6 +195,7 @@ public class QueriesTest {
         if (!result.isPresent()) {
             Assert.fail();
         }
+        result.get().forEach( (key, value) -> System.out.println("" + key + ";" + value));
         result.get().forEach((key, value) -> {
             switch (key) {
                 case Airport1:
