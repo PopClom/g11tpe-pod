@@ -20,13 +20,11 @@ import g11tpe.mappers.MovementsPerAirportPairMapper;
 import g11tpe.reducers.*;
 import org.apache.commons.lang3.tuple.MutablePair;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class QueryExecutor {
@@ -134,47 +132,20 @@ public class QueryExecutor {
     public Optional<Map<String, Long>> destinations (String origin, int n) {
         JobTracker jobTracker = hz.getJobTracker("destinations-count");
         final IList<Movement> list = hz.getList("movements");
-        filterByOACI(list, origin);
         final KeyValueSource<String, Movement> source = KeyValueSource.fromList(list);
 
         Job<String, Movement> job = jobTracker.newJob(source);
         ICompletableFuture<Map<String, Long>> future = job
-                .mapper(new DestinationsMapper())
+                .mapper(new DestinationsMapper(origin))
                 .combiner(new DestinationsCombinerFactory())
                 .reducer(new DestinationsReducerFactory())
-                .submit(new DestinationsCollator());
+                .submit(new DestinationsCollator(n));
 
         try {
-            Map<String, Long> result = future.get();
-            Map<String, Long> limitedResult = new HashMap<>();
-            AtomicLong acum = new AtomicLong(0);
-            AtomicInteger i = new AtomicInteger();
-
-            result.forEach((key, value) -> {
-                if (i.get() <= n) {
-                    limitedResult.put(key, value);
-                } else {
-                    acum.updateAndGet(v -> v + value);
-                }
-                i.getAndIncrement();
-            });
-
-            return Optional.of(limitedResult);
+            return Optional.of(future.get());
         } catch (Exception e) {
             e.printStackTrace();
             return Optional.empty();
         }
-    }
-
-    private void filterByOACI(IList<Movement> moves, String origin) {
-
-        List<Movement> toRemove = new ArrayList<>();
-        for (int i = 0; i < moves.size(); i++) {
-
-            if (!moves.get(i).getOrigin().equals(origin)) {
-                toRemove.add(moves.get(i));
-            }
-        }
-        moves.removeAll(toRemove);
     }
 }
