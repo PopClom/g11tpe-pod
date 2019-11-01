@@ -19,6 +19,9 @@ import g11tpe.reducers.DestinationsReducerFactory;
 import g11tpe.reducers.MovementCountReducerFactory;
 import org.apache.commons.lang3.tuple.MutablePair;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class QueryExecutor {
@@ -71,9 +74,8 @@ public class QueryExecutor {
     public void destinations (String origin, int n) {
         JobTracker jobTracker = hz.getJobTracker("destinations-count");
         final IList<Movement> list = hz.getList("movements");
-        list.removeIf(element -> !element.getOrigin().equals(origin));
+        filterByOACI(list, origin);
         final KeyValueSource<String, Movement> source = KeyValueSource.fromList(list);
-
         Job<String, Movement> job = jobTracker.newJob(source);
         ICompletableFuture<Map<String, Long>> future = job
                 .mapper(new DestinationsMapper())
@@ -89,5 +91,17 @@ public class QueryExecutor {
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
+    }
+
+    private void filterByOACI(IList<Movement> moves, String origin) {
+
+        List<Movement> toRemove = new ArrayList<>();
+        for (int i = 0; i < moves.size(); i++) {
+
+            if (!moves.get(i).getOrigin().equals(origin)) {
+                toRemove.add(moves.get(i));
+            }
+        }
+        moves.removeAll(toRemove);
     }
 }
