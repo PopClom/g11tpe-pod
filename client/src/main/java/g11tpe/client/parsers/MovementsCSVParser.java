@@ -1,5 +1,6 @@
 package g11tpe.client.parsers;
 
+import com.hazelcast.core.IList;
 import com.opencsv.CSVParserBuilder;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
@@ -19,7 +20,7 @@ public class MovementsCSVParser {
     private static final int DESTINATION_POS = 6;
     private static final int AIRILINE_POS = 7;
 
-    public static List<Movement> parseFile(final String airportsFilePath) throws InvalidCSVMovementsFileException, IOException, IllegalArgumentException   {
+    public static void parseFile(final String airportsFilePath, IList<Movement> movementsIList) throws InvalidCSVMovementsFileException, IOException, IllegalArgumentException  {
         List<Movement> movements = new LinkedList<>();
         try (CSVReader csvReader = new CSVReaderBuilder(new FileReader(airportsFilePath))
                 .withCSVParser(new CSVParserBuilder().withSeparator(';').build())
@@ -35,19 +36,14 @@ public class MovementsCSVParser {
                             line[ORIGIN_POS],
                             line[DESTINATION_POS],
                             line[AIRILINE_POS]);
-
                     movements.add(movement);
+
                 } catch (illegalMovementException e) {
                     throw new InvalidCSVMovementsFileException(e.getMessage());
                 }
             }
-            System.out.println(movements.get(0).toString());
-            System.out.println(movements.get(1).toString());
-            System.out.println(movements.get(2).toString());
-            System.out.println(movements.size());
+            movementsIList.addAll(movements);
         }
-
-        return null;
     }
 
 }

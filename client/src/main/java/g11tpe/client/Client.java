@@ -24,14 +24,19 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Map;
 
 public class Client {
     private static Logger logger = LoggerFactory.getLogger(Client.class);
     private static Parameters parameters;
-    private static List<String> airportsList;
-    private static List<Movement> movementsList;
+    private static HazelcastInstance hzClient;
+    private final static String HZ_NAME = "grupo-11";
+    private final static String HZ_PASSWORD = "chau";
     private final static String AIRPORTS_INFILE_NAME = "aeropuertos.csv";
     private final static String MOVEMENTS_INFILE_NAME = "movimientos.csv";
+
+    private static IMap<String, Map<String, String>> airportsIMap ;
+    private static IList<Movement> movementsIList;
 
     public static void main(String[] args) {
         logger.info("g11tpe Client Starting ...");
@@ -43,23 +48,34 @@ public class Client {
             System.exit(-1);
         }
 
-        HazelcastInstance hzClient = getHazelCastClient();
-//
-//        //probando que funcione
-//        IMap<Long, String> map = hzClient.getMap("data");
-//        System.out.println(map.values());
-
+        hzClient = getHazelCastClient();
+        initializeHzCollections();
         parseInFiles();
 
-    //    IMap<Integer, Movement> movementsIList = hzClient.getMap(CollectionNames.MOVEMENTS_LIST.getName());
 
+        switch (parameters.getQueryN()) {
+            case 1:
+                break;
+            case 2:
+                break;
+            case 3:
+                break;
+            case 4:
+                break;
+        }
 
     }
+
+    private static void initializeHzCollections() {
+        airportsIMap = hzClient.getMap(CollectionNames.AIRPORTS_MAP.getName());
+        movementsIList = hzClient.getList(CollectionNames.MOVEMENTS_LIST.getName());
+    }
+
 
     private static HazelcastInstance getHazelCastClient() {
         ClientConfig config = new ClientConfig();
         GroupConfig groupConfig = config.getGroupConfig();
-        groupConfig.setName("grupo-11").setPassword("chau");
+        groupConfig.setName(HZ_NAME).setPassword(HZ_PASSWORD);
 
         ClientNetworkConfig networkConfig = config.getNetworkConfig();
         for (String address : parameters.getAddresses()) {
@@ -71,8 +87,8 @@ public class Client {
 
     private static void parseInFiles() {
         try {
-            airportsList = AirportsCSVParser.parseFile(parameters.getInPath() + '/' + AIRPORTS_INFILE_NAME);
-            movementsList = MovementsCSVParser.parseFile(parameters.getInPath() + '/' + MOVEMENTS_INFILE_NAME);
+            AirportsCSVParser.parseFile(parameters.getInPath() + '/' + AIRPORTS_INFILE_NAME, airportsIMap);
+            MovementsCSVParser.parseFile(parameters.getInPath() + '/' + MOVEMENTS_INFILE_NAME, movementsIList);
         } catch (InvalidCSVAirportsFileException | InvalidCSVMovementsFileException | IOException e) {
             e.printStackTrace();
             System.exit(-1);

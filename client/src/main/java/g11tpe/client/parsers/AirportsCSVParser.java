@@ -1,5 +1,6 @@
 package g11tpe.client.parsers;
 
+import com.hazelcast.core.IMap;
 import com.opencsv.CSVParserBuilder;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
@@ -8,28 +9,28 @@ import g11tpe.client.exceptions.InvalidCSVAirportsFileException;
 
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 public class AirportsCSVParser {
     private static final int OACI_POS = 1;
+    private static final int NAME_POS = 4;
 
-    public static List<String> parseFile(final String airportsFilePath) throws InvalidCSVAirportsFileException, IOException, IllegalArgumentException  {
-        List<String> airports = new LinkedList<>();
+    public static void parseFile(final String airportsFilePath, final  IMap<String, Map<String, String>> airportsImap) throws InvalidCSVAirportsFileException, IOException, IllegalArgumentException  {
+        Map<String, Map<String, String>> airportsMap = new HashMap<>();
         try (CSVReader csvReader = new CSVReaderBuilder(new FileReader(airportsFilePath))
                 .withCSVParser(new CSVParserBuilder().withSeparator(';').build())
                 .build()) {
             String[] line = csvReader.readNext(); //skip headers line
             while ((line = csvReader.readNext()) != null) {
                 if(line[OACI_POS].compareTo("") != 0){
-                    airports.add(line[OACI_POS]);
+                    Map<String , String> map = new HashMap<>();
+                    map.put(line[OACI_POS], line[NAME_POS]);
+                    airportsMap.put(line[OACI_POS], map);
                 }
             }
         }
-        System.out.print(airports.size());
-        System.out.println(airports);
-        System.out.println(airportsFilePath);
+        airportsImap.putAll(airportsMap);
 
-        return airports;
     }
 }
