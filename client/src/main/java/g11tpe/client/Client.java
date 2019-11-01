@@ -37,7 +37,7 @@ public class Client {
             /* tirar un error */
         }
         else {
-            movesPerAirport.get().forEach((key, value) -> System.out.println("" + key + ";" + value));
+            //movesPerAirport.get().forEach((key, value) -> System.out.println("" + key + ";" + value));
         }
 
         int n = 3;
@@ -47,11 +47,11 @@ public class Client {
         if (!cabotagePerAirline.isPresent()) {
             /* tirar un error */
         } else {
-            cabotagePerAirline.get().forEach( (key, value) -> System.out.println("" + key + ";" + value + "%"));
+            //cabotagePerAirline.get().forEach( (key, value) -> System.out.println("" + key + ";" + value + "%"));
         }
 
         /* QUERY 4 */
-        Optional<Map<String, Long>> destinations = qe.destinations("CORD", n);
+        Optional<Map<String, Long>> destinations = qe.destinations("EZEI", n);
         if (!destinations.isPresent()) {
             /* tirar un error */
         } else {
