@@ -5,6 +5,7 @@ import com.hazelcast.core.HazelcastInstanceAware;
 import com.hazelcast.core.IMap;
 import com.hazelcast.mapreduce.Reducer;
 import com.hazelcast.mapreduce.ReducerFactory;
+import g11tpe.util.CollectionNames;
 import org.apache.commons.lang3.tuple.MutablePair;
 
 public class MovementCountReducerFactory implements ReducerFactory<String, Long, MutablePair<String, Long>>, HazelcastInstanceAware {
@@ -38,7 +39,7 @@ public class MovementCountReducerFactory implements ReducerFactory<String, Long,
         }
         @Override
         public MutablePair<String, Long> finalizeReduce() {
-            final IMap<String, String> airports = hz.getMap("airports");
+            final IMap<String, String> airports = hz.getMap(CollectionNames.AIRPORTS_MAP.getName());
             return new MutablePair<>(airports.get(this.key), sum);
         }
     }
