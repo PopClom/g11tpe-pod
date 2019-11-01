@@ -9,6 +9,7 @@ import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IList;
 import com.hazelcast.core.IMap;
+import g11tpe.QueryExecutor;
 import g11tpe.enums.FlightClass;
 import g11tpe.enums.FlightClassification;
 import g11tpe.Movement;
@@ -18,13 +19,14 @@ import g11tpe.client.exceptions.InvalidProgramParametersException;
 import g11tpe.client.parsers.AirportsCSVParser;
 import g11tpe.client.parsers.MovementsCSVParser;
 import g11tpe.util.CollectionNames;
+import org.apache.commons.lang3.tuple.MutablePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public class Client {
     private static Logger logger = LoggerFactory.getLogger(Client.class);
@@ -52,15 +54,42 @@ public class Client {
         initializeHzCollections();
         parseInFiles();
 
+        QueryExecutor qe = new QueryExecutor(hzClient);
 
         switch (parameters.getQueryN()) {
             case 1:
+                Optional<Map<String, MutablePair<String, Long>>> movesPerAirport = qe.movementsPerAirport(hzClient);
+                if (!movesPerAirport.isPresent()) {
+                    /* tirar un error */
+                }
+                else {
+                    movesPerAirport.get().forEach((key, value) -> System.out.println("" + key + ";" + value));
+                }
                 break;
             case 2:
+                Optional<Map<String, Double>> cabotagePerAirline = qe.cabotagePerAirline(parameters.getN());
+                if (!cabotagePerAirline.isPresent()) {
+                    /* tirar un error */
+                } else {
+                    cabotagePerAirline.get().forEach( (key, value) -> System.out.println("" + key + ";" + value + "%"));
+                }
                 break;
             case 3:
+                Optional<List<MutablePair<Long, MutablePair<String, String>>>> movementsPerAirportPair = qe.movementsPerAirportPair();
+                if (!movementsPerAirportPair.isPresent()) {
+                    /* tirar un error */
+                } else {
+                    movementsPerAirportPair.get().forEach((elem) -> System.out.println("" + elem.getLeft() + ", " +
+                            elem.getRight().getLeft() + ", " + elem.getRight().getRight()));
+                }
                 break;
             case 4:
+                Optional<Map<String, Long>> destinations = qe.destinations(parameters.getOaci(), parameters.getN());
+                if (!destinations.isPresent()) {
+                    /* tirar un error */
+                } else {
+                    destinations.get().forEach( (key, value) -> System.out.println("" + key + ";" + value));
+                }
                 break;
         }
 

@@ -143,4 +143,20 @@ public class Parameters {
         return outPath;
     }
 
+    public int getN() {
+        return n;
+    }
+
+    public void setN(int n) {
+        this.n = n;
+    }
+
+    public String getOaci() {
+        return oaci;
+    }
+
+    public void setOaci(String oaci) {
+        this.oaci = oaci;
+    }
+
 }

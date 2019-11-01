@@ -9,6 +9,7 @@ import g11tpe.enums.FlightClass;
 import g11tpe.enums.FlightClassification;
 import g11tpe.enums.MoveType;
 import g11tpe.exceptions.illegalMovementException;
+import g11tpe.util.CollectionNames;
 import org.apache.commons.lang3.tuple.MutablePair;
 import org.junit.Assert;
 import org.junit.Before;
@@ -60,7 +61,7 @@ public class QueriesTest {
     @Before
     public final void before() throws illegalMovementException {
 
-        final IList<Movement> listOfMovements = hz.getList("movements");
+        final IList<Movement> listOfMovements = hz.getList(CollectionNames.MOVEMENTS_LIST.getName());
 
         /* QUERY 1 */
         listOfMovements.add(new Movement(FlightClassification.INTERNATIONAL, MoveType.TAKEOFF, FlightClass.REGULAR, Airport4, Airport3, Airline1));

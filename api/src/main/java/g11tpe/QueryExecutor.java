@@ -18,6 +18,7 @@ import g11tpe.mappers.DestinationsMapper;
 import g11tpe.mappers.MovementCountMapper;
 import g11tpe.mappers.MovementsPerAirportPairMapper;
 import g11tpe.reducers.*;
+import g11tpe.util.CollectionNames;
 import org.apache.commons.lang3.tuple.MutablePair;
 
 import java.util.List;
@@ -37,7 +38,7 @@ public class QueryExecutor {
 
     public Optional<Map<String, MutablePair<String, Long>>> movementsPerAirport(HazelcastInstance hz) {
         JobTracker jobTracker = hz.getJobTracker("movement-count");
-        final IList<Movement> movements = hz.getList("movements");
+        final IList<Movement> movements = hz.getList(CollectionNames.MOVEMENTS_LIST.getName());
 
         final KeyValueSource<String, Movement> source = KeyValueSource.fromList(movements);
 
@@ -57,7 +58,7 @@ public class QueryExecutor {
 
     public Optional<List<MutablePair<Long, MutablePair<String, String>>>> movementsPerAirportPair() {
         JobTracker jobTracker = hz.getJobTracker("movement-pair-count");
-        final IList<Movement> movements = hz.getList("movements");
+        final IList<Movement> movements = hz.getList(CollectionNames.MOVEMENTS_LIST.getName());
 
         final KeyValueSource<String, Movement> source1 = KeyValueSource.fromList(movements);
 
@@ -93,7 +94,7 @@ public class QueryExecutor {
 
     public Optional<Map<String, Double>> cabotagePerAirline(int n) {
         JobTracker jobTracker = hz.getJobTracker("airline-cabotage-count");
-        final IList<Movement> list = hz.getList("movements");
+        final IList<Movement> list = hz.getList(CollectionNames.MOVEMENTS_LIST.getName());
         final KeyValueSource<String, Movement> source = KeyValueSource.fromList(list);
 
         Job<String, Movement> job = jobTracker.newJob(source);
@@ -131,7 +132,7 @@ public class QueryExecutor {
 
     public Optional<Map<String, Long>> destinations (String origin, int n) {
         JobTracker jobTracker = hz.getJobTracker("destinations-count");
-        final IList<Movement> list = hz.getList("movements");
+        final IList<Movement> list = hz.getList(CollectionNames.MOVEMENTS_LIST.getName());
         final KeyValueSource<String, Movement> source = KeyValueSource.fromList(list);
 
         Job<String, Movement> job = jobTracker.newJob(source);
