@@ -24,10 +24,11 @@ public class Client {
         final IMap<String, String> airports = hz.getMap("airports");
         populate(movements, airports);
         QueryExecutor qe = new QueryExecutor(hz);
-        qe.movementsPerAirport(hz);
+        //qe.movementsPerAirport(hz);
         int n = 3;
-        qe.cabotagePerAirline(n);
-        qe.destinations("EZEI", n);
+        //qe.cabotagePerAirline(n);
+        //qe.destinations("EZEI", n);
+        qe.movementsPerAirportPair();
     }
 
     private static void populate(IList<Movement> list, IMap<String, String> map) {

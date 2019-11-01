@@ -15,13 +15,12 @@ import g11tpe.combiners.DestinationsCombinerFactory;
 import g11tpe.mappers.CabotagePerAirlineMapper;
 import g11tpe.mappers.DestinationsMapper;
 import g11tpe.mappers.MovementCountMapper;
-import g11tpe.reducers.CabotagePerAirlineReducerFactory;
-import g11tpe.reducers.DestinationsReducerFactory;
-import g11tpe.reducers.MovementCountReducerFactory;
-import g11tpe.reducers.MovementSimpleCountReducerFactory;
+import g11tpe.mappers.MovementsPerAirportPairMapper;
+import g11tpe.reducers.*;
 import org.apache.commons.lang3.tuple.MutablePair;
 
 import java.util.Map;
+import java.util.Set;
 
 public class QueryExecutor {
     private HazelcastInstance hz;
@@ -70,15 +69,16 @@ public class QueryExecutor {
             System.out.println(e.getMessage());
         }
 
-        final KeyValueSource<String, Integer> source2 = KeyValueSource.fromList(movementsAux);
+        final KeyValueSource<String, Integer> source2 = KeyValueSource.fromMap(movementsAux);
 
-        Job<String, Movement> job2 = jobTracker.newJob(source);
-        ICompletableFuture<Map<String, Integer>> future2 = job2
-                .mapper(new MovementCountMapper())
-                .reducer(new MovementSimpleCountReducerFactory())
+        Job<String, Integer> job2 = jobTracker.newJob(source2);
+        ICompletableFuture<Map<Integer, Set<String>>> future2 = job2
+                .mapper(new MovementsPerAirportPairMapper())
+                .reducer(new MovementsPerAiportPairReducerFactory())
                 .submit();
 
         try {
+            Map<Integer, Set<String>> result2 = future2.get();
             result2.forEach((key, value) -> System.out.println("" + key + ": " + value));
         } catch (Exception e) {
             System.out.println(e.getMessage());
