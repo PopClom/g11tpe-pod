@@ -27,7 +27,7 @@ public class Client {
         qe.movementsPerAirport(hz);
         int n = 3;
         qe.cabotagePerAirline(n);
-        qe.destinations("EZEI", n);
+        qe.destinations("CORD", n);
     }
 
     private static void populate(IList<Movement> list, IMap<String, String> map) {
