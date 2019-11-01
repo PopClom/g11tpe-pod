@@ -1,4 +1,4 @@
-package g11tpe;
+package g11tpe.exceptions;
 
 public class illegalMovementException extends Exception {
 

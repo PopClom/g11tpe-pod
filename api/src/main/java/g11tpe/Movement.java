@@ -6,6 +6,7 @@ import com.hazelcast.nio.serialization.DataSerializable;
 import g11tpe.enums.FlightClass;
 import g11tpe.enums.FlightClassification;
 import g11tpe.enums.MoveType;
+import g11tpe.exceptions.illegalMovementException;
 
 import java.io.IOException;
 
