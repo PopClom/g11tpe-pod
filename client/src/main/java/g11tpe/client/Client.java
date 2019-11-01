@@ -13,6 +13,7 @@ import org.apache.commons.lang3.tuple.MutablePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -50,6 +51,15 @@ public class Client {
             //cabotagePerAirline.get().forEach( (key, value) -> System.out.println("" + key + ";" + value + "%"));
         }
 
+        /* QUERY 3 */
+        Optional<List<MutablePair<Long, MutablePair<String, String>>>> movementsPerAirportPair = qe.movementsPerAirportPair();
+        if (!movementsPerAirportPair.isPresent()) {
+            /* tirar un error */
+        } else {
+            movementsPerAirportPair.get().forEach((elem) -> System.out.println("" + elem.getLeft() + ", " +
+                    elem.getRight().getLeft() + ", " + elem.getRight().getRight()));
+        }
+
         /* QUERY 4 */
         Optional<Map<String, Long>> destinations = qe.destinations("EZEI", n);
         if (!destinations.isPresent()) {
@@ -57,7 +67,6 @@ public class Client {
         } else {
             destinations.get().forEach( (key, value) -> System.out.println("" + key + ";" + value));
         }
-
     }
 
     private static void populate(IList<Movement> list, IMap<String, String> map) {
@@ -72,8 +81,10 @@ public class Client {
             list.add(new Movement(FlightClassification.CABOTAGE, MoveType.TAKEOFF, FlightClass.PRIVATE_FOREIGNER, "EZEI", "CORD", "Emirates"));
             list.add(new Movement(FlightClassification.CABOTAGE, MoveType.LANDING, FlightClass.PRIVATE_FOREIGNER, "EZEI", "CORD", "Flybondi"));
             list.add(new Movement(FlightClassification.CABOTAGE, MoveType.LANDING, FlightClass.PRIVATE_FOREIGNER, "EZEI", "CORD", "Flybondi"));
+            list.add(new Movement(FlightClassification.CABOTAGE, MoveType.TAKEOFF, FlightClass.PRIVATE_FOREIGNER, "PALO", "CORD", "Flybondi"));
             map.put("EZEI", "EZEIZA");
             map.put("CORD", "CORDOBA");
+            map.put("PALO", "PALOMAR");
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }

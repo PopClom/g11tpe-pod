@@ -195,7 +195,6 @@ public class QueriesTest {
         if (!result.isPresent()) {
             Assert.fail();
         }
-        result.get().forEach( (key, value) -> System.out.println("" + key + ";" + value));
         result.get().forEach((key, value) -> {
             switch (key) {
                 case Airport1:
