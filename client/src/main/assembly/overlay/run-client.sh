@@ -1,4 +1,3 @@
 #!/bin/bash
 
-java -cp 'lib/jars/*' "g11tpe.client.Client" $*
-
+java -cp 'lib/jars/*' "ar.edu.itba.pod.client.Client" $*
