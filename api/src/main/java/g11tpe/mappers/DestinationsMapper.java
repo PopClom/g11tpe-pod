@@ -16,7 +16,7 @@ public class DestinationsMapper implements Mapper<String, Movement, String, Long
 
     @Override
     public void map(String s, Movement movement, Context<String, Long> context) {
-        if (movement.getMovementType().equals(MoveType.LANDING) && movement.getOrigin().equals(this.origin)) {
+        if (movement.getMovementType().equals(MoveType.TAKEOFF) && movement.getOrigin().equals(this.origin)) {
             context.emit(movement.getDestination(), ONE);
         }
     }
