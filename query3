@@ -1,0 +1,2 @@
+cd client/target/g11tpe-client-1.0-SNAPSHOT
+./query3 $*

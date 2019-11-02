@@ -1,0 +1,3 @@
+#!/bin/bash
+
+java $* -DqueryN=1 -cp 'lib/jars/*' "g11tpe.client.Client"
