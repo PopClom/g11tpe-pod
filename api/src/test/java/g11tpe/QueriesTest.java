@@ -51,6 +51,9 @@ public class QueriesTest {
     private static final long EXPECTED_CABOTAGE_FLIGHTS = 8;
     private static final int MAX_AIRLINES = 3;
 
+    /* QUERY 3 */
+    private static final int EXPECTED_THOUSAND = 0;
+
     /* QUERY 4 ; origin = MNOP */
     private static final long EXPECTED_FLIGHTS_1 = 4;
     private static final long EXPECTED_FLIGHTS_2 = 0;
@@ -182,9 +185,31 @@ public class QueriesTest {
 
     /* QUERY 3 */
     @Test
-    public final void query3() {
+    public final void movementsPerAirportPair() {
 
-        /* query executor 3 */
+        Optional<List<MutablePair<Long, MutablePair<String, String>>>> result = qe.movementsPerAirportPair();
+        if (!result.isPresent()) {
+            Assert.fail();
+        }
+        result.get().forEach(pair -> {
+            switch (pair.right.left) {
+                case Airport1:
+                    Assert.assertTrue(pair.right.right.equals(Airport2) || pair.right.right.equals(Airport3) || pair.right.right.equals(Airport4) || pair.right.right.equals(Airport5));
+                    break;
+                case Airport2:
+                    Assert.assertTrue(pair.right.right.equals(Airport3) || pair.right.right.equals(Airport4) || pair.right.right.equals(Airport5));
+                    break;
+                case Airport3:
+                    Assert.assertTrue(pair.right.right.equals(Airport4) || pair.right.right.equals(Airport5));
+                    break;
+                case Airport4:
+                    Assert.assertEquals(Airport5, pair.right.right);
+                    break;
+                default:
+                    Assert.fail();
+            }
+        });
+
     }
 
     /* QUERY 4 */
