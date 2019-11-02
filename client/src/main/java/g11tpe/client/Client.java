@@ -10,8 +10,6 @@ import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IList;
 import com.hazelcast.core.IMap;
 import g11tpe.QueryExecutor;
-import g11tpe.enums.FlightClass;
-import g11tpe.enums.FlightClassification;
 import g11tpe.Movement;
 import g11tpe.client.exceptions.InvalidCSVAirportsFileException;
 import g11tpe.client.exceptions.InvalidCSVMovementsFileException;
@@ -29,7 +27,7 @@ import java.util.Map;
 import java.util.Optional;
 
 public class Client {
-    private static Logger logger = LoggerFactory.getLogger(Client.class);
+    private static Logger logger;
     private static Parameters parameters;
     private static HazelcastInstance hzClient;
     private final static String HZ_NAME = "grupo-11";
@@ -40,8 +38,8 @@ public class Client {
     private static IMap<String, String> airportsIMap ;
     private static IList<Movement> movementsIList;
 
+
     public static void main(String[] args) {
-        logger.info("g11tpe Client Starting ...");
         parameters = new Parameters();
         try {
             parameters.validate();
@@ -50,15 +48,19 @@ public class Client {
             System.exit(-1);
         }
 
+        initializeLogger();
+
         hzClient = getHazelCastClient();
         initializeHzCollections();
         parseInFiles();
 
         QueryExecutor qe = new QueryExecutor(hzClient);
 
+        logger.info("Inicio del trabajo de Map Reduce");
         switch (parameters.getQueryN()) {
             case 1:
                 Optional<Map<String, MutablePair<String, Long>>> movesPerAirport = qe.movementsPerAirport(hzClient);
+                logger.info("Fin del trabajo de Map Reduce");
                 if (!movesPerAirport.isPresent()) {
                     /* tirar un error */
                 }
@@ -68,6 +70,7 @@ public class Client {
                 break;
             case 2:
                 Optional<Map<String, Double>> cabotagePerAirline = qe.cabotagePerAirline(parameters.getN());
+                logger.info("Fin del trabajo de Map Reduce");
                 if (!cabotagePerAirline.isPresent()) {
                     /* tirar un error */
                 } else {
@@ -76,6 +79,7 @@ public class Client {
                 break;
             case 3:
                 Optional<List<MutablePair<Long, MutablePair<String, String>>>> movementsPerAirportPair = qe.movementsPerAirportPair();
+                logger.info("Fin del trabajo de Map Reduce");
                 if (!movementsPerAirportPair.isPresent()) {
                     /* tirar un error */
                 } else {
@@ -85,6 +89,7 @@ public class Client {
                 break;
             case 4:
                 Optional<Map<String, Long>> destinations = qe.destinations(parameters.getOaci(), parameters.getN());
+                logger.info("Fin del trabajo de Map Reduce");
                 if (!destinations.isPresent()) {
                     /* tirar un error */
                 } else {
@@ -92,6 +97,13 @@ public class Client {
                 }
                 break;
         }
+
+    }
+
+    private static void initializeLogger() {
+        //hacer script: java -Dlogfilename=my_fancy_filename  example.Application
+        System.setProperty("loggingPath", parameters.getOutPath() + "/query" + parameters.getQueryN() + ".txt");
+        logger =  LoggerFactory.getLogger(Client.class);
 
     }
 
@@ -115,6 +127,7 @@ public class Client {
     }
 
     private static void parseInFiles() {
+        logger.info("Inicio de la lectura de los archivos de entrada");
         try {
             AirportsCSVParser.parseFile(parameters.getInPath() + '/' + AIRPORTS_INFILE_NAME, airportsIMap);
             MovementsCSVParser.parseFile(parameters.getInPath() + '/' + MOVEMENTS_INFILE_NAME, movementsIList);
@@ -122,5 +135,6 @@ public class Client {
             e.printStackTrace();
             System.exit(-1);
         }
+        logger.info("Fin de la lectura de los archivos de entrada");
     }
 }
