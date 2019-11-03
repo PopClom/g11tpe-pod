@@ -22,22 +22,32 @@ public class CabotagePerAirlineCollator implements Collator<Map.Entry<String, Lo
     @Override
     public Map<String, Double> collate( Iterable<Map.Entry<String, Long>> values ) {
 
-        Map<String, Double> map = new HashMap<>();
+        Map<String, Long> map = new HashMap<>();
         AtomicLong acum = new AtomicLong();
         AtomicLong others = new AtomicLong();
-        AtomicInteger i = new AtomicInteger();
         values.forEach( stringLongEntry -> acum.addAndGet(stringLongEntry.getValue()));
         values.forEach( stringLongEntry -> {
-            map.put(stringLongEntry.getKey(), (((double) stringLongEntry.getValue() / (double) acum.get()) * 10000.0) / 100.0);
-            if (i.get() > n) {
-                others.addAndGet(stringLongEntry.getValue());
-            }
+                if (!stringLongEntry.getKey().equals("N/A"))
+                    map.put(stringLongEntry.getKey(), stringLongEntry.getValue());
         });
 
-        Map<String, Double> result = map.entrySet().stream().sorted(Map.Entry.comparingByValue(Comparator.reverseOrder())).limit(n).collect(Collectors.toMap(
+        Map<String, Long> aux = map.entrySet().stream().sorted((mapEntry1, mapEntry2) -> {
+            int cmp = mapEntry1.getValue().compareTo(mapEntry2.getValue());
+            if (cmp != 0)
+                return -cmp;
+            else
+                return mapEntry1.getKey().compareTo(mapEntry2.getKey());
+        }).limit(n).collect(Collectors.toMap(
                 Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
-        result.put("Otros", (((double) others.get() / (double) acum.get()) * 10000.0) / 100.0);
-        return result;
 
+        Map<String, Double> result = new LinkedHashMap<>();
+        aux.forEach((key, value) -> {
+            result.put(key, (((double) value / (double) acum.get()) * 10000.0) / 100);
+            others.addAndGet(value);
+        });
+
+        result.put("Otros", 100.0 - (((double) others.get() / (double) acum.get()) * 10000.0) / 100.0);
+
+        return result;
     }
 }
