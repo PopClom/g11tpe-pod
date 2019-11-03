@@ -9,7 +9,7 @@
   <groupId>g11tpe</groupId>
   <artifactId>g11tpe-api</artifactId>
   <version>1.0-SNAPSHOT</version>
-  <name>g11tpe-api</name>
+  <name>tpe2-g11-api</name>
 
   <properties>
     <org.apache.commons.version>3.4</org.apache.commons.version>

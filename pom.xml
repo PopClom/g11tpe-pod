@@ -6,7 +6,7 @@
   <artifactId>g11tpe-parent</artifactId>
   <version>1.0-SNAPSHOT</version>
   <packaging>pom</packaging>
-  <name>g11tpe-parent</name>
+  <name>tpe2-g11-parent</name>
   <modules>
     <module>api</module>
     <module>server</module>

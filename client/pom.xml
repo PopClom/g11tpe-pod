@@ -9,7 +9,7 @@
   <groupId>g11tpe</groupId>
   <artifactId>g11tpe-client</artifactId>
   <version>1.0-SNAPSHOT</version>
-  <name>g11tpe-client</name>
+  <name>tpe2-g11-client</name>
   <dependencies>
     <dependency>
       <groupId>g11tpe</groupId>
