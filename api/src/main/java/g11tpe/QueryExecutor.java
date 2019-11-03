@@ -22,11 +22,8 @@ import g11tpe.util.CollectionNames;
 import org.apache.commons.lang3.tuple.MutablePair;
 
 import java.util.List;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class QueryExecutor {
     private HazelcastInstance hz;
@@ -68,7 +65,7 @@ public class QueryExecutor {
                 .reducer(new MovementSimpleCountReducerFactory())
                 .submit();
 
-        final IMap<String, Long> movementsAux = hz.getMap("movements-aux");
+        final IMap<String, Long> movementsAux = hz.getMap(CollectionNames.MOVEMENTS_AUX_LIST.getName());
         try {
             Map<String, Long> result1 = future1.get();
             movementsAux.putAll(result1);
