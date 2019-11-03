@@ -15,11 +15,5 @@ public class Server {
     public static void main(String[] args) {
         logger.info("g11tpe Server Starting ...");
         HazelcastInstance h = Hazelcast.newHazelcastInstance();
-
-//        Map<Long, String> map = h.getMap("data");
-//        IdGenerator idGenerator = h.getIdGenerator("newid");
-//        for (int i = 0; i < 10; i++) {
-//            map.put(Integer.toUnsignedLong(i), Integer.toString(i));
-//        }
     }
 }

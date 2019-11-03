@@ -21,7 +21,8 @@ public class AirportsCSVParser {
         try (CSVReader csvReader = new CSVReaderBuilder(new FileReader(airportsFilePath))
                 .withCSVParser(new CSVParserBuilder().withSeparator(';').build())
                 .build()) {
-            String[] line = csvReader.readNext(); //skip headers line
+            String[] line = csvReader.readNext(); //salteo la linea de headers
+          //Salteo los aeropuertos que no tienen oaci
             while ((line = csvReader.readNext()) != null) {
                 if(line[OACI_POS].compareTo("") != 0){
                     airportsMap.put(line[OACI_POS], line[NAME_POS]);

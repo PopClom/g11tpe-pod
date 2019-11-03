@@ -109,12 +109,14 @@ public class Client {
         //hacer script: java -Dlogfilename=my_fancy_filename  example.Application
         System.setProperty("loggingPath", parameters.getOutPath() + "/query" + parameters.getQueryN() + ".txt");
         logger =  LoggerFactory.getLogger(Client.class);
-
     }
 
     private static void initializeHzCollections() {
         airportsIMap = hzClient.getMap(CollectionNames.AIRPORTS_MAP.getName());
         movementsIList = hzClient.getList(CollectionNames.MOVEMENTS_LIST.getName());
+        /*Hacemos clear a las colecciones*/
+        airportsIMap.clear();
+        movementsIList.clear();
     }
 
 
