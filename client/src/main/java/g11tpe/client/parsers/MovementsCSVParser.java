@@ -31,6 +31,9 @@ public class MovementsCSVParser {
                 .build()) {
             String[] line = csvReader.readNext(); //skip headers line
             while ((line = csvReader.readNext()) != null) {
+                if (line[AIRILINE_POS].equalsIgnoreCase("N/A") || line[AIRILINE_POS].equalsIgnoreCase("N / A") ) {
+                    line[AIRILINE_POS] = "Otros";
+                }
 
                 try {
                     Movement movement = new Movement(
