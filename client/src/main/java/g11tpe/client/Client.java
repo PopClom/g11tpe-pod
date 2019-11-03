@@ -57,6 +57,8 @@ public class Client {
 
         QueryResultsToCsv resultsToCsv = new QueryResultsToCsv(parameters.getOutPath());
 
+        final long startTime = System.currentTimeMillis();
+        long endTime = startTime;
         logger.info("Inicio del trabajo de Map Reduce");
         switch (parameters.getQueryN()) {
             case 1:
@@ -67,6 +69,7 @@ public class Client {
                 else {
                     //movesPerAirport.get().forEach((key, value) -> System.out.println("" + key + ";" + value));
                     logger.info("Fin del trabajo de Map Reduce");
+                    endTime = System.currentTimeMillis();
                     resultsToCsv.query1(movesPerAirport.get());
 
                 }
@@ -78,6 +81,7 @@ public class Client {
                 } else {
                     //cabotagePerAirline.get().forEach( (key, value) -> System.out.println("" + key + ";" + value + "%"));
                     logger.info("Fin del trabajo de Map Reduce");
+                    endTime = System.currentTimeMillis();
                     resultsToCsv.query2(cabotagePerAirline.get());
                 }
                 break;
@@ -89,6 +93,7 @@ public class Client {
 //                    movementsPerAirportPair.get().forEach((elem) -> System.out.println("" + elem.getLeft() + ", " +
 //                            elem.getRight().getLeft() + ", " + elem.getRight().getRight()));
                     logger.info("Fin del trabajo de Map Reduce");
+                    endTime = System.currentTimeMillis();
                     resultsToCsv.query3(movementsPerAirportPair.get());
                 }
                 break;
@@ -99,10 +104,14 @@ public class Client {
                 } else {
                     //destinations.get().forEach( (key, value) -> System.out.println("" + key + ";" + value));
                     logger.info("Fin del trabajo de Map Reduce");
+                    endTime = System.currentTimeMillis();
                     resultsToCsv.query4(destinations.get());
                 }
                 break;
         }
+        logger.info("Tiempo de trabajo entre el log de \"Inicio del trabajo" +
+                "de Map Reduce\" y el de \"Fin del trabajo de Map Reduce\" es: {} ms.", endTime - startTime);
+        shutDownHz();
     }
 
     private static void initializeLogger() {
@@ -131,6 +140,12 @@ public class Client {
         }
 
         return HazelcastClient.newHazelcastClient(config);
+    }
+
+    private static void shutDownHz() {
+        airportsIMap.destroy();
+        movementsIList.destroy();
+        hzClient.shutdown();
     }
 
     private static void parseInFiles() {

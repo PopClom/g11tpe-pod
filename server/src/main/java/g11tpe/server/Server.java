@@ -14,6 +14,10 @@ public class Server {
 
     public static void main(String[] args) {
         logger.info("g11tpe Server Starting ...");
+        if(!System.getProperties().containsKey("interface")) {
+            logger.error("Interface parameter missing");
+            System.exit(-1);
+        }
         HazelcastInstance h = Hazelcast.newHazelcastInstance();
     }
 }
