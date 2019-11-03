@@ -14,7 +14,8 @@ public class MovementCountCollator implements Collator<Map.Entry<String, Mutable
 
         Map<String, MutablePair<String, Long>> map = new HashMap<>();
         values.forEach( mapEntry -> {
-            map.put(mapEntry.getKey(), mapEntry.getValue());
+            if (mapEntry.getValue().getLeft() != null)
+                map.put(mapEntry.getKey(), mapEntry.getValue());
         });
 
         return map.entrySet().stream().sorted((mapEntry1, mapEntry2) -> {
