@@ -24,7 +24,7 @@ Ejecutar en la terminal desde el directorio del proyecto:
         
 **-Client queries-**
 Ejecutar en la terminal desde el directorio del proyecto:
-    $> ./queryN -Daddresses="=xx.xx.xx.xx:XXXX;yy.yy.yy.yy:YYYY -DinPath=WW -DoutPath=ZZ [params]
+    $> ./queryN -Daddresses="xx.xx.xx.xx:XXXX;yy.yy.yy.yy:YYYY" -DinPath=WW -DoutPath=ZZ [params]
     
      donde
              -queryN ​es el script que corre la query N.
