@@ -68,10 +68,9 @@ public class Client {
                 }
                 else {
                     //movesPerAirport.get().forEach((key, value) -> System.out.println("" + key + ";" + value));
-                    logger.info("Fin del trabajo de Map Reduce");
-                    endTime = System.currentTimeMillis();
                     resultsToCsv.query1(movesPerAirport.get());
-
+                    logger.info("Fin del trabajo de Map Reduce"); //Colocamos este log luego de la escritura del archivo de respuesta por consigna.
+                    endTime = System.currentTimeMillis();
                 }
                 break;
             case 2:
@@ -80,9 +79,9 @@ public class Client {
                     logger.error("Ocurrió un error en el trabajo de Map Reduce");
                 } else {
                     //cabotagePerAirline.get().forEach( (key, value) -> System.out.println("" + key + ";" + value + "%"));
+                    resultsToCsv.query2(cabotagePerAirline.get());
                     logger.info("Fin del trabajo de Map Reduce");
                     endTime = System.currentTimeMillis();
-                    resultsToCsv.query2(cabotagePerAirline.get());
                 }
                 break;
             case 3:
@@ -92,9 +91,9 @@ public class Client {
                 } else {
 //                    movementsPerAirportPair.get().forEach((elem) -> System.out.println("" + elem.getLeft() + ", " +
 //                            elem.getRight().getLeft() + ", " + elem.getRight().getRight()));
+                    resultsToCsv.query3(movementsPerAirportPair.get());
                     logger.info("Fin del trabajo de Map Reduce");
                     endTime = System.currentTimeMillis();
-                    resultsToCsv.query3(movementsPerAirportPair.get());
                 }
                 break;
             case 4:
@@ -103,9 +102,9 @@ public class Client {
                     logger.error("Ocurrió un error en el trabajo de Map Reduce");
                 } else {
                     //destinations.get().forEach( (key, value) -> System.out.println("" + key + ";" + value));
+                    resultsToCsv.query4(destinations.get());
                     logger.info("Fin del trabajo de Map Reduce");
                     endTime = System.currentTimeMillis();
-                    resultsToCsv.query4(destinations.get());
                 }
                 break;
         }
