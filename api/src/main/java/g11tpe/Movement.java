@@ -70,7 +70,7 @@ public class Movement implements DataSerializable {
         out.writeUTF(airline);
         out.writeInt(classification.ordinal());
         out.writeInt(movementType.ordinal());
-        out.writeInt(flightClass.ordinal());
+        out.writeInt(1);
     }
 
     @Override
@@ -80,7 +80,7 @@ public class Movement implements DataSerializable {
         this.airline = in.readUTF();
         this.classification = FlightClassification.values()[in.readInt()];
         this.movementType = MoveType.values()[in.readInt()];
-        this.flightClass = FlightClass.values()[in.readInt()];
+        this.flightClass = FlightClass.values()[1];
     }
 
     @Override
