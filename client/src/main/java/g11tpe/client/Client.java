@@ -3,9 +3,7 @@ package g11tpe.client;
 import com.hazelcast.client.HazelcastClient;
 import com.hazelcast.client.config.ClientConfig;
 import com.hazelcast.client.config.ClientNetworkConfig;
-import com.hazelcast.config.Config;
 import com.hazelcast.config.GroupConfig;
-import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IList;
 import com.hazelcast.core.IMap;
@@ -144,6 +142,4 @@ public class Client {
         }
         logger.info("Fin de la lectura de los archivos de entrada");
     }
-
-
 }

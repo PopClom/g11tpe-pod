@@ -1,7 +1,6 @@
 package g11tpe.client.writers;
 
 import com.opencsv.CSVWriter;
-import g11tpe.client.Parameters;
 import org.apache.commons.lang3.tuple.MutablePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

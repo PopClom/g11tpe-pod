@@ -123,8 +123,28 @@ public class Parameters {
     }
 
     private void printParametersHelp () {
-        //TODO escribir el help
-        System.out.println("HELP:");
+        System.out.println("La forma de correr una query es la siguiente: " +
+                "$> ./queryN -Daddresses=\"=xx.xx.xx.xx:XXXX;yy.yy.yy.yy:YYYY -DinPath=WW -DoutPath=ZZ [params]\n" +
+                "    \n" +
+                "    Ejemplo de invocación:\n" +
+                "    $> ./query2 -Daddresses=\"192.168.1.10:5701;192.168.1.10:5702\" -DoutPath=/home/maite/Documents/POD/TP2 -DinPath=/home/maite/Documents/POD/TP2 -Dn=3\n" +
+                "\n" +
+                "               \n" +
+                "     donde\n" +
+                "             -queryN es el script que corre la query N.\n" +
+                "             -Daddressesrefiere a las direcciones IP de los nodos con sus puertos (una o más)\n" +
+                "             -DinPath indica el path donde están ambos archivos de entrada \u200Baeropuertos.csv\n" +
+                "             y movimientos.csv.\n" +
+                "             -DoutPath indica el path donde estarán ambos archivos de salida \u200Bquery1.csv y\n" +
+                "             query1.txt.\n" +
+                "             [params]: los parámetros extras para las queries 2 y 4:\n" +
+                "                    -en la query 2, agregar el parámetro -Dn=N\n" +
+                "                        $> ./queryN -Daddresses=\"=xx.xx.xx.xx:XXXX;yy.yy.yy.yy:YYYY -DinPath=WW -DoutPath=ZZ -Dn=N\n" +
+                "                            donde N sirve para determinar las top N aerolineas según el porcentaje de movimeintos de cabotaje\n" +
+                "                    \n" +
+                "                    -en la query 4, agregar los parámetros -Dn=N y -Doaci=OACI\n" +
+                "                             donde N sirve para determinar los n aeropuertos con mayro cantidad de movimientos de despegue que tienen como origen a un aeropuerto OACI.\n" +
+                "               \n");
     }
 
     public int getQueryN() {
