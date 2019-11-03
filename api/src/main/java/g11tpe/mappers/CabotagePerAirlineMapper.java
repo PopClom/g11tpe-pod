@@ -11,7 +11,6 @@ public class CabotagePerAirlineMapper implements Mapper<String, Movement, String
 
     @Override
     public void map(String key, Movement value, Context<String, Long> context) {
-        /* mapping only landing movements to avoid repetitions */
         if (value.getFlightClassification().equals(FlightClassification.CABOTAGE)) {
             context.emit(value.getAirline(), ONE);
         }
