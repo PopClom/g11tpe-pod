@@ -15,12 +15,12 @@ Instalar maven
  
 **-Server-**
 Ejecutar en la terminal desde el directorio del proyecto:
-    $> ./run-server.sh -Dinterface=XXX.YYY.ZZZ.*
+    $> ./run-server -Dinterface=XXX.YYY.ZZZ.*
     
     Donde -Dinterface indica la interfaz que Hazelcast debería de usar
     
      Ejemplo de invocación:
-        $> ./run-server.sh -Dinterface=192.168.1.*
+        $> ./run-server -Dinterface=192.168.1.*
         
 **-Client queries-**
 Ejecutar en la terminal desde el directorio del proyecto:
