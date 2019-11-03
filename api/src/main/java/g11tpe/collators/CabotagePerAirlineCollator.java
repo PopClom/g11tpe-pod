@@ -27,7 +27,7 @@ public class CabotagePerAirlineCollator implements Collator<Map.Entry<String, Lo
         AtomicLong others = new AtomicLong();
         values.forEach( stringLongEntry -> acum.addAndGet(stringLongEntry.getValue()));
         values.forEach( stringLongEntry -> {
-                if (!stringLongEntry.getKey().equals("N/A"))
+                if (!stringLongEntry.getKey().equals("Otros"))
                     map.put(stringLongEntry.getKey(), stringLongEntry.getValue());
         });
 
