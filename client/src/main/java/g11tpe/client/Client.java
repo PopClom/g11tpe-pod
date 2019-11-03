@@ -16,6 +16,7 @@ import g11tpe.client.exceptions.InvalidCSVMovementsFileException;
 import g11tpe.client.exceptions.InvalidProgramParametersException;
 import g11tpe.client.parsers.AirportsCSVParser;
 import g11tpe.client.parsers.MovementsCSVParser;
+import g11tpe.client.writers.QueryResultsToCsv;
 import g11tpe.util.CollectionNames;
 import org.apache.commons.lang3.tuple.MutablePair;
 import org.slf4j.Logger;
@@ -40,7 +41,6 @@ public class Client {
 
 
     public static void main(String[] args) {
-        System.out.println(System.getProperties().getProperty("hola"));
         parameters = new Parameters();
         try {
             parameters.validate();
@@ -57,48 +57,54 @@ public class Client {
 
         QueryExecutor qe = new QueryExecutor(hzClient);
 
+        QueryResultsToCsv resultsToCsv = new QueryResultsToCsv(parameters.getOutPath());
+
         logger.info("Inicio del trabajo de Map Reduce");
         switch (parameters.getQueryN()) {
             case 1:
                 Optional<Map<String, MutablePair<String, Long>>> movesPerAirport = qe.movementsPerAirport(hzClient);
-                logger.info("Fin del trabajo de Map Reduce");
                 if (!movesPerAirport.isPresent()) {
-                    /* tirar un error */
+                    logger.error("Ocurrió un error en el trabajo de Map Reduce");
                 }
                 else {
-                    movesPerAirport.get().forEach((key, value) -> System.out.println("" + key + ";" + value));
+                    //movesPerAirport.get().forEach((key, value) -> System.out.println("" + key + ";" + value));
+                    logger.info("Fin del trabajo de Map Reduce");
+                    resultsToCsv.query1(movesPerAirport.get());
+
                 }
                 break;
             case 2:
                 Optional<Map<String, Double>> cabotagePerAirline = qe.cabotagePerAirline(parameters.getN());
-                logger.info("Fin del trabajo de Map Reduce");
                 if (!cabotagePerAirline.isPresent()) {
-                    /* tirar un error */
+                    logger.error("Ocurrió un error en el trabajo de Map Reduce");
                 } else {
-                    cabotagePerAirline.get().forEach( (key, value) -> System.out.println("" + key + ";" + value + "%"));
+                    //cabotagePerAirline.get().forEach( (key, value) -> System.out.println("" + key + ";" + value + "%"));
+                    logger.info("Fin del trabajo de Map Reduce");
+                    resultsToCsv.query2(cabotagePerAirline.get());
                 }
                 break;
             case 3:
                 Optional<List<MutablePair<Long, MutablePair<String, String>>>> movementsPerAirportPair = qe.movementsPerAirportPair();
-                logger.info("Fin del trabajo de Map Reduce");
                 if (!movementsPerAirportPair.isPresent()) {
-                    /* tirar un error */
+                    logger.error("Ocurrió un error en el trabajo de Map Reduce");
                 } else {
-                    movementsPerAirportPair.get().forEach((elem) -> System.out.println("" + elem.getLeft() + ", " +
-                            elem.getRight().getLeft() + ", " + elem.getRight().getRight()));
+//                    movementsPerAirportPair.get().forEach((elem) -> System.out.println("" + elem.getLeft() + ", " +
+//                            elem.getRight().getLeft() + ", " + elem.getRight().getRight()));
+                    logger.info("Fin del trabajo de Map Reduce");
+                    resultsToCsv.query3(movementsPerAirportPair.get());
                 }
                 break;
             case 4:
                 Optional<Map<String, Long>> destinations = qe.destinations(parameters.getOaci(), parameters.getN());
-                logger.info("Fin del trabajo de Map Reduce");
                 if (!destinations.isPresent()) {
-                    /* tirar un error */
+                    logger.error("Ocurrió un error en el trabajo de Map Reduce");
                 } else {
-                    destinations.get().forEach( (key, value) -> System.out.println("" + key + ";" + value));
+                    //destinations.get().forEach( (key, value) -> System.out.println("" + key + ";" + value));
+                    logger.info("Fin del trabajo de Map Reduce");
+                    resultsToCsv.query4(destinations.get());
                 }
                 break;
         }
-
     }
 
     private static void initializeLogger() {
@@ -133,9 +139,11 @@ public class Client {
             AirportsCSVParser.parseFile(parameters.getInPath() + '/' + AIRPORTS_INFILE_NAME, airportsIMap);
             MovementsCSVParser.parseFile(parameters.getInPath() + '/' + MOVEMENTS_INFILE_NAME, movementsIList);
         } catch (InvalidCSVAirportsFileException | InvalidCSVMovementsFileException | IOException e) {
-            e.printStackTrace();
+            logger.error("Error al parsear los archivos de entrada: {}",  e.getMessage());
             System.exit(-1);
         }
         logger.info("Fin de la lectura de los archivos de entrada");
     }
+
+
 }
