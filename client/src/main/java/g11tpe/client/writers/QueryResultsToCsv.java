@@ -51,7 +51,7 @@ public class QueryResultsToCsv {
             cabotagePerAirline.forEach((key, value) -> {
                 String[] outputline = new String[2];
                 outputline[0] = key;
-                outputline[1] = Double.valueOf(new DecimalFormat("#.##").format(value)) + "%";
+                outputline[1] =  String.format("%.2f", value) + "%";
                 writer.writeNext(outputline);
             });
 
